@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75.86% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/29</span>
+                <span class='fraction'>22/29</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">92.3% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>12/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">72.72% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>16/22</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -105,52 +105,52 @@
 <a name='L40'></a><a href='#L40'>40</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import axios from 'axios';
 &nbsp;
 // ???????, ??? USE_MOCK_DATA ?????????? ? false
-const USE_MOCK_DATA = <span class="cstat-no" title="statement not covered" >false;</span>
+const USE_MOCK_DATA = false;
 &nbsp;
 // URL ???????
-const API_URL = <span class="cstat-no" title="statement not covered" >'http://89.208.104.134:8080/api/books';</span>
+const API_URL = 'http://89.208.104.134:8080/api/books';
 &nbsp;
 // ??????? ??? ???????? ??????????? API
-const isApiAvailable = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
+const isApiAvailable = <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
 <span class="cstat-no" title="statement not covered" >  if (USE_MOCK_DATA) <span class="cstat-no" title="statement not covered" >return false;</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  try {</span>
@@ -163,21 +163,21 @@ const isApiAvailable = <span class="cstat-no" title="statement not covered" ><sp
 };
 &nbsp;
 // ???????? ??????? API
-const realGetAllBooks = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >axios.get(API_URL);</span></span>
-const realGetBookById = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(i</span>d) =&gt; <span class="cstat-no" title="statement not covered" >axios.get(`${API_URL}/${id}`);</span></span>
-const realCreateBook = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(b</span>ook) =&gt; <span class="cstat-no" title="statement not covered" >axios.post(API_URL, book);</span></span>
-const realUpdateBook = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(i</span>d, book) =&gt; <span class="cstat-no" title="statement not covered" >axios.put(`${API_URL}/${id}`, book);</span></span>
-const realDeleteBook = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(i</span>d) =&gt; <span class="cstat-no" title="statement not covered" >axios.delete(`${API_URL}/${id}`);</span></span>
-const realSearchBooks = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(q</span>uery) =&gt; <span class="cstat-no" title="statement not covered" >axios.get(`${API_URL}/search?query=${query}`);</span></span>
+const realGetAllBooks = () =&gt; axios.get(API_URL);
+const realGetBookById = (id) =&gt; axios.get(`${API_URL}/${id}`);
+const realCreateBook = (book) =&gt; axios.post(API_URL, book);
+const realUpdateBook = (id, book) =&gt; axios.put(`${API_URL}/${id}`, book);
+const realDeleteBook = (id) =&gt; axios.delete(`${API_URL}/${id}`);
+const realSearchBooks = (query) =&gt; axios.get(`${API_URL}/search?query=${query}`);
 &nbsp;
 // ???????????? ??????
-const BookService = <span class="cstat-no" title="statement not covered" >{</span>
-  getAllBooks: <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >realGetAllBooks(),</span>
-  getBookById: <span class="fstat-no" title="function not covered" >(i</span>d) =&gt; <span class="cstat-no" title="statement not covered" >realGetBookById(id),</span>
-  createBook: <span class="fstat-no" title="function not covered" >(b</span>ook) =&gt; <span class="cstat-no" title="statement not covered" >realCreateBook(book),</span>
-  updateBook: <span class="fstat-no" title="function not covered" >(i</span>d, book) =&gt; <span class="cstat-no" title="statement not covered" >realUpdateBook(id, book),</span>
-  deleteBook: <span class="fstat-no" title="function not covered" >(i</span>d) =&gt; <span class="cstat-no" title="statement not covered" >realDeleteBook(id),</span>
-  searchBooks: <span class="fstat-no" title="function not covered" >(q</span>uery) =&gt; <span class="cstat-no" title="statement not covered" >realSearchBooks(query),</span>
+const BookService = {
+  getAllBooks: () =&gt; realGetAllBooks(),
+  getBookById: (id) =&gt; realGetBookById(id),
+  createBook: (book) =&gt; realCreateBook(book),
+  updateBook: (id, book) =&gt; realUpdateBook(id, book),
+  deleteBook: (id) =&gt; realDeleteBook(id),
+  searchBooks: (query) =&gt; realSearchBooks(query),
 };
 &nbsp;
 export default BookService;</pre></td></tr></table></pre>
@@ -187,7 +187,7 @@ export default BookService;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-03-20T20:40:17.423Z
+                at 2025-04-28T18:24:36.778Z
             </div>
         <script src="prettify.js"></script>
         <script>

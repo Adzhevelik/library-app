@@ -5,24 +5,33 @@ const StatusIndicator = () => {
   const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
-    // РџСЂРѕРІРµСЂСЏРµРј СЃС‚Р°С‚СѓСЃ СЃРѕРµРґРёРЅРµРЅРёСЏ РїСЂРё Р·Р°РіСЂСѓР·РєРµ
-    setIsOnline(navigator.onLine);
+    // Проверяем статус соединения при загрузке
+    // Используем try/catch на случай, если navigator не определен (хотя в браузере он есть)
+    try {
+        setIsOnline(navigator.onLine);
+    } catch (e) {
+        console.warn("Could not access navigator.onLine");
+        // Оставляем isOnline как true по умолчанию
+    }
 
-    // Р”РѕР±Р°РІР»СЏРµРј СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ РґР»СЏ РѕС‚СЃР»РµР¶РёРІР°РЅРёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃС‚Р°С‚СѓСЃР° СЃРѕРµРґРёРЅРµРЅРёСЏ
+
+    // Добавляем слушатели событий для отслеживания изменения статуса соединения
     const handleOnline = () => {
       setIsOnline(true);
       setShowMessage(true);
+      // Скрываем сообщение об онлайне через 3 секунды
       setTimeout(() => setShowMessage(false), 3000);
     };
 
     const handleOffline = () => {
       setIsOnline(false);
-      setShowMessage(true);
+      setShowMessage(true); // Сообщение об оффлайне остается видимым
     };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    // Очистка слушателей при размонтировании компонента
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -32,10 +41,11 @@ const StatusIndicator = () => {
   if (!showMessage) return null;
 
   return (
-    <div className={`status-indicator ${isOnline ? 'online' : 'offline'}`}>
-      {isOnline 
-        ? 'вњ… РЎРѕРµРґРёРЅРµРЅРёРµ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРѕ. Р”Р°РЅРЅС‹Рµ Р±СѓРґСѓС‚ СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅС‹.' 
-        : 'вљ пёЏ РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ. РСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ Р»РѕРєР°Р»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ.'}
+    // Добавляем role="alert" для доступности и тестирования
+    <div role="alert" className={`status-indicator ${isOnline ? 'online' : 'offline'}`}>
+      {isOnline
+        ? '? Соединение восстановлено. Данные будут синхронизированы.'
+        : '?? Нет соединения. Используются локальные данные.'}
     </div>
   );
 };

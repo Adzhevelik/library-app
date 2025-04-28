@@ -1,4 +1,1 @@
-// Complete replacement with minimal test
-test('placeholder test', () => {
-  // Empty test that will always pass
-});
+test('placeholder test', () => {});

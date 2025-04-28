@@ -12,8 +12,8 @@ describe('Error Component', () => {
       </MemoryRouter>
     );
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
-    // Проверяем иконку по тексту
-    expect(screen.getByText('??')).toBeInTheDocument(); // Исправлено
+    // Проверяем иконку по тексту (убедись, что символ ?? сохранен правильно)
+    expect(screen.getByText('??')).toBeInTheDocument(); // ИСПРАВЛЕНО: Ищем правильный эмодзи
   });
 
   test('renders the default back link correctly', () => {

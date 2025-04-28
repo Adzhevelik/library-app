@@ -23,27 +23,28 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+          # Пути теперь относительно корня репозитория
           cache-dependency-path: |
-            library-app/package-lock.json
+            package-lock.json
             backend/package-lock.json
 
       - name: FE Install Dependencies
         run: npm ci
-        working-directory: library-app # <-- ИСПРАВЛЕНО: Убрали ./
+        # working-directory: library-app # УДАЛЕНО: Выполняем в корне
 
       - name: FE Build
         run: npm run build --if-present
-        working-directory: library-app # <-- ИСПРАВЛЕНО: Убрали ./
+        # working-directory: library-app # УДАЛЕНО: Выполняем в корне
 
       - name: FE Test
         run: npm test
-        working-directory: library-app # <-- ИСПРАВЛЕНО: Убрали ./
+        # working-directory: library-app # УДАЛЕНО: Выполняем в корне
         env:
           CI: true
 
       - name: BE Install Dependencies
         run: npm ci
-        working-directory: backend # <-- ИСПРАВЛЕНО: Убрали ./
+        working-directory: backend # ОСТАВЛЕНО: Переходим в папку backend
 
       # Закомментированный шаг для тестов бэкенда
       # - name: BE Test

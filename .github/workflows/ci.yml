@@ -1,6 +1,5 @@
-name: CI # Название workflow
+name: CI
 
-# Триггеры для запуска: push в main или pull request в main
 on:
   push:
     branches: [ "main" ]
@@ -8,66 +7,47 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # Задание (job) для сборки и тестирования
   build_and_test:
-    runs-on: ubuntu-latest # Используем последнюю Ubuntu
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x] # Указываем желаемую версию Node.js (LTS)
+        node-version: [18.x]
 
     steps:
-      # 1. Клонируем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Настраиваем Node.js и кэширование npm
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          # Кэшируем node_modules глобально для всего job'а
-          # Ключ кэша будет зависеть от ОС, версии Node и хеша lock-файлов
           cache: 'npm'
-          # Важно: укажем пути к обоим lock-файлам, чтобы кэш инвалидировался при изменении любого из них
           cache-dependency-path: |
             library-app/package-lock.json
             backend/package-lock.json
 
-      # 3. Frontend: Установка зависимостей
-      - name: FE: Install Dependencies
-        run: npm ci # Используем ci для чистой установки по lock-файлу
-        working-directory: ./library-app # <--- Указываем рабочую директорию!
-
-      # 4. Frontend: Сборка
-      - name: FE: Build
-        run: npm run build --if-present # Запускаем сборку, если скрипт есть
-        working-directory: ./library-app # <--- Указываем рабочую директорию!
-
-      # 5. Frontend: Тестирование
-      - name: FE: Test
-        run: npm test
-        working-directory: ./library-app # <--- Указываем рабочую директорию!
-        env:
-          CI: true # Эта переменная часто используется react-scripts для запуска тестов без watch-режима
-
-      # --- Опционально: Шаги для Backend ---
-      # 6. Backend: Установка зависимостей
-      - name: BE: Install Dependencies
+      - name: FE Install Dependencies # Строка 38 (проверь отступ - ровно 2 пробела перед дефисом)
         run: npm ci
-        working-directory: ./backend # <--- Указываем рабочую директорию!
+        working-directory: ./library-app
 
-      # 7. Backend: Тестирование (если есть тесты для бэкенда)
-      # Замечание: Твой текущий books.test.js для бэкенда - это интеграционный тест,
-      # требующий запущенного сервера и базы данных. Он НЕ будет работать в CI без
-      # дополнительной настройки (запуск сервера, поднятие тестовой БД).
-      # Если у тебя появятся unit-тесты для бэкенда, их можно будет запускать так:
-      # - name: BE: Test
+      - name: FE Build
+        run: npm run build --if-present
+        working-directory: ./library-app
+
+      - name: FE Test
+        run: npm test
+        working-directory: ./library-app
+        env:
+          CI: true
+
+      - name: BE Install Dependencies
+        run: npm ci
+        working-directory: ./backend
+
+      # Закомментированный шаг для тестов бэкенда (требует доп. настройки)
+      # - name: BE Test
       #   run: npm test
       #   working-directory: ./backend
       #   env:
       #     CI: true
-      #     # Возможно, понадобятся переменные окружения для тестовой БД
-      #     # DB_USER: ${{ secrets.TEST_DB_USER }}
-      #     # DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
-      #     # ...

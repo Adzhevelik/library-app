@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Импортируем useCallback
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import BookService from './BookService';
@@ -20,23 +20,39 @@ const EditBook = () => {
     isbn: '',
     genre: '',
     availableCopies: 0,
-    totalCopies: 0
+    totalCopies: 1 // Минимальное значение для totalCopies
   });
 
-  useEffect(() => {
-    fetchBook();
-  }, [id]);
-
-  const fetchBook = () => {
+  // Оборачиваем fetchBook в useCallback
+  const fetchBook = useCallback(() => {
+    setLoading(true);
+    setError(null);
     BookService.getBookById(id)
       .then(response => {
         const bookData = response.data;
-        // Format date for input field (YYYY-MM-DD)
-        if (bookData.publicationDate) {
-          const date = new Date(bookData.publicationDate);
-          bookData.publicationDate = date.toISOString().split('T')[0];
+        // Format date for input field (YYYY-MM-DD) if it exists
+        if (bookData?.publicationDate) {
+          try {
+             const date = new Date(bookData.publicationDate);
+             // Проверяем, что дата валидна перед форматированием
+             if (!isNaN(date.getTime())) {
+                bookData.publicationDate = date.toISOString().split('T')[0];
+             } else {
+                 bookData.publicationDate = ''; // Устанавливаем пустую строку, если дата невалидна
+             }
+          } catch (e) {
+             console.error("Error formatting date:", e);
+             bookData.publicationDate = '';
+          }
+        } else {
+            bookData.publicationDate = ''; // Устанавливаем пустую строку, если даты нет
         }
-        setBook(bookData);
+        // Устанавливаем значения по умолчанию для копий, если они null/undefined
+        setBook({
+            ...bookData,
+            availableCopies: bookData.availableCopies ?? 0,
+            totalCopies: bookData.totalCopies ?? 1,
+        });
         setLoading(false);
       })
       .catch(error => {
@@ -45,19 +61,24 @@ const EditBook = () => {
         setLoading(false);
         toast.error('Failed to load book data');
       });
-  };
-  
+  }, [id]); // Зависимость useCallback - только id
+
+  useEffect(() => {
+    fetchBook();
+    // Добавляем fetchBook в массив зависимостей
+  }, [fetchBook]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBook({ ...book, [name]: value });
+    setBook(prevBook => ({ ...prevBook, [name]: value }));
   };
 
   const validateForm = () => {
-    if (!book.title.trim()) {
+    if (!book.title?.trim()) { // Добавим ?. для безопасности
       toast.error('Title is required');
       return false;
     }
-    if (!book.author.trim()) {
+    if (!book.author?.trim()) { // Добавим ?. для безопасности
       toast.error('Author is required');
       return false;
     }
@@ -67,30 +88,42 @@ const EditBook = () => {
       return false;
     }
     // Copies validation
-    if (parseInt(book.availableCopies) > parseInt(book.totalCopies)) {
+    const available = parseInt(book.availableCopies, 10);
+    const total = parseInt(book.totalCopies, 10);
+    // Проверяем, что парсинг удался и total > 0 (или >= 1)
+    if (isNaN(available) || isNaN(total) || total < 1) {
+        toast.error('Total copies must be a number greater than 0.');
+        return false;
+    }
+     if (available < 0) {
+        toast.error('Available copies cannot be negative.');
+        return false;
+    }
+    if (available > total) {
       toast.error('Available copies cannot exceed total copies');
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setSaving(true);
-    
-    // Convert string values to appropriate types
-    const bookData = {
+
+    // Преобразуем копии в числа перед отправкой
+    const bookDataToUpdate = {
       ...book,
-      availableCopies: parseInt(book.availableCopies),
-      totalCopies: parseInt(book.totalCopies)
+      availableCopies: parseInt(book.availableCopies, 10),
+      totalCopies: parseInt(book.totalCopies, 10)
     };
-    BookService.updateBook(id, bookData)
+
+    BookService.updateBook(id, bookDataToUpdate)
       .then(response => {
         toast.success('Book updated successfully!');
         navigate(`/books/${id}`);
@@ -109,7 +142,8 @@ const EditBook = () => {
   }
 
   if (error) {
-    return <Error message={error} />;
+    // Используем компонент Error для отображения ошибки
+    return <Error message={error} backLink={`/books/${id}`} backText="Back to Details"/>;
   }
 
   return (
@@ -117,9 +151,9 @@ const EditBook = () => {
       <div className="page-header">
         <h2 className="form-title">Edit Book</h2>
       </div>
-      
+
       <div className="card">
-        <BookForm 
+        <BookForm
           book={book}
           onChange={handleChange}
           onSubmit={handleSubmit}

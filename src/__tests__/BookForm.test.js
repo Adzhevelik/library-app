@@ -51,7 +51,7 @@ describe('BookForm Component', () => {
     expect(screen.getByRole('button', { name: /Cancel/i })).toBeInTheDocument();
   });
 
-  test.skip('calls onChange handler when input value changes', async () => {
+  test('calls onChange handler when input value changes', async () => {
     const user = userEvent.setup();
     render(<BookForm {...defaultProps} />);
 

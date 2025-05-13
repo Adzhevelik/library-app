@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Error from '../Error';
 
 describe('Error Component', () => {
-  test.skip('renders the error message provided', () => {
+  test('renders the error message provided', () => {
     const errorMessage = 'Something went terribly wrong!';
     render(
       <MemoryRouter>

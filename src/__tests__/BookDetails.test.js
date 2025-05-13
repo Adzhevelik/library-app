@@ -6,7 +6,7 @@ import BookDetails from '../BookDetails';
 import BookService from '../BookService';
 import { toast } from 'react-toastify';
 
-// Ìîêàåì çàâèñèìîñòè
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 jest.mock('../BookService');
 jest.mock('react-toastify', () => ({
   toast: {
@@ -17,7 +17,7 @@ jest.mock('react-toastify', () => ({
 }));
 
 const mockNavigate = jest.fn();
-// Ìîêàåì õóêè react-router-dom
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ react-router-dom
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ id: '1' }),
@@ -155,4 +155,12 @@ describe('BookDetails Component', () => {
     expect(toast.success).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
+});
+
+test('BookDetails Ñ€ĞµĞ½Ğ´ĞµÑ€Ğ¸Ñ‚ÑÑ Ğ±ĞµĞ· Ğ¾ÑˆĞ¸Ğ±Ğ¾Ğº', () => {
+  render(
+    <MemoryRouter>
+      <BookDetails />
+    </MemoryRouter>
+  );
 });

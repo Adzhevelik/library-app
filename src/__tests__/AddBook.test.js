@@ -6,7 +6,7 @@ import AddBook from '../AddBook';
 import BookService from '../BookService';
 import { toast } from 'react-toastify';
 
-// Ìîêàåì çàâèñèìîñòè
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 jest.mock('../BookService');
 jest.mock('react-toastify', () => ({
   toast: {
@@ -16,7 +16,7 @@ jest.mock('react-toastify', () => ({
   ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
-// Ìîêàåì useNavigate
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ useNavigate
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -171,7 +171,7 @@ describe('AddBook Component', () => {
         <AddBook />
       </MemoryRouter>
     );
-    await fillValidForm(); // Çàïîëíÿåì ôîğìó âàëèäíûìè äàííûìè
+    await fillValidForm(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     const submitButton = screen.getByRole('button', { name: /Add Book/i });
 
     await user.click(submitButton);
@@ -204,7 +204,7 @@ describe('AddBook Component', () => {
         <AddBook />
       </MemoryRouter>
     );
-    await fillValidForm(); // Çàïîëíÿåì ôîğìó âàëèäíûìè äàííûìè
+    await fillValidForm(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     await user.click(screen.getByRole('button', { name: /Add Book/i }));
 
     await waitFor(() => {
@@ -212,7 +212,7 @@ describe('AddBook Component', () => {
     });
 
     await waitFor(() => {
-      // Äîëæåí ïîêàçàòü îøèáêó èç API
+      // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ API
       expect(toast.error).toHaveBeenCalledWith('Unique ISBN constraint violated');
     });
 
@@ -221,7 +221,7 @@ describe('AddBook Component', () => {
   });
 
   test('shows generic error toast if createBook fails without specific message', async () => {
-    const genericError = new Error('Network Error'); // Îøèáêà áåç response.data.message
+    const genericError = new Error('Network Error'); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ response.data.message
     BookService.createBook.mockRejectedValue(genericError);
 
     render(
@@ -229,7 +229,7 @@ describe('AddBook Component', () => {
         <AddBook />
       </MemoryRouter>
     );
-    await fillValidForm(); // Çàïîëíÿåì ôîğìó âàëèäíûìè äàííûìè
+    await fillValidForm(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     await user.click(screen.getByRole('button', { name: /Add Book/i }));
 
     await waitFor(() => {
@@ -237,7 +237,7 @@ describe('AddBook Component', () => {
     });
 
     await waitFor(() => {
-       // Äîëæåí ïîêàçàòü îøèáêó ïî óìîë÷àíèş
+       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
       expect(toast.error).toHaveBeenCalledWith('Failed to add book');
     });
 
@@ -256,4 +256,12 @@ describe('AddBook Component', () => {
     await user.click(screen.getByRole('button', { name: /Cancel/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/books');
   });
+});
+
+test('AddBook Ñ€ĞµĞ½Ğ´ĞµÑ€Ğ¸Ñ‚ÑÑ Ğ±ĞµĞ· Ğ¾ÑˆĞ¸Ğ±Ğ¾Ğº', () => {
+  render(
+    <MemoryRouter>
+      <AddBook />
+    </MemoryRouter>
+  );
 });

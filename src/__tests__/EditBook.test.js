@@ -6,7 +6,7 @@ import EditBook from '../EditBook';
 import BookService from '../BookService';
 import { toast } from 'react-toastify';
 
-// Ìîêàåì çàâèñèìîñòè
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 jest.mock('../BookService');
 jest.mock('react-toastify', () => ({
   toast: {
@@ -18,7 +18,7 @@ jest.mock('react-toastify', () => ({
 
 const mockNavigate = jest.fn();
 const mockBookId = '5';
-// Ìîêàåì õóêè react-router-dom
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ react-router-dom
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ id: mockBookId }),
@@ -187,18 +187,18 @@ describe('EditBook Component', () => {
     await screen.findByLabelText(/Total Copies/i);
     const totalCopiesInput = screen.getByLabelText(/Total Copies/i);
 
-    // Ñëó÷àé 0
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0
     await user.clear(totalCopiesInput);
     await user.type(totalCopiesInput, '0');
     await user.click(screen.getByRole('button', { name: /Save Changes/i }));
     expect(toast.error).toHaveBeenCalledWith('Total copies must be a number greater than 0.');
 
-    // Ñëó÷àé íå-÷èñëî
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½
     fireEvent.change(totalCopiesInput, { target: { value: 'abc' } });
     await user.click(screen.getByRole('button', { name: /Save Changes/i }));
     expect(toast.error).toHaveBeenCalledWith('Total copies must be a number greater than 0.');
 
-    // Ñëó÷àé îòğèöàòåëüíîå ÷èñëî
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     await user.clear(totalCopiesInput);
     await user.type(totalCopiesInput, '-5');
     await user.click(screen.getByRole('button', { name: /Save Changes/i }));
@@ -262,4 +262,12 @@ describe('EditBook Component', () => {
     expect(mockNavigate).toHaveBeenCalledWith(`/books/${mockBookId}`);
     expect(BookService.updateBook).not.toHaveBeenCalled();
   });
+});
+
+test('EditBook Ñ€ĞµĞ½Ğ´ĞµÑ€Ğ¸Ñ‚ÑÑ Ğ±ĞµĞ· Ğ¾ÑˆĞ¸Ğ±Ğ¾Ğº', () => {
+  render(
+    <MemoryRouter>
+      <EditBook />
+    </MemoryRouter>
+  );
 });

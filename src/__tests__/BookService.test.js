@@ -1,26 +1,26 @@
 import axios from 'axios';
 import BookService from '../BookService';
 
-// Мокаем весь модуль axios
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ axios
 jest.mock('axios');
 
 const API_URL = 'http://89.208.104.134:8080/api/books';
 
 describe('BookService', () => {
   afterEach(() => {
-    // Сбрасываем все моки после каждого теста
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     jest.clearAllMocks();
   });
 
   test('getAllBooks should call axios.get with the correct URL', async () => {
     const mockData = [{ id: '1', title: 'Book 1' }];
-    axios.get.mockResolvedValue({ data: mockData }); // Настраиваем мок ответа
+    axios.get.mockResolvedValue({ data: mockData }); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
     const response = await BookService.getAllBooks();
 
     expect(axios.get).toHaveBeenCalledTimes(1);
     expect(axios.get).toHaveBeenCalledWith(API_URL);
-    expect(response.data).toEqual(mockData); // Проверяем, что данные из мока возвращаются
+    expect(response.data).toEqual(mockData); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
   });
 
   test('getBookById should call axios.get with the correct URL and ID', async () => {
@@ -62,7 +62,7 @@ describe('BookService', () => {
 
   test('deleteBook should call axios.delete with the correct URL and ID', async () => {
     const bookId = 'delete-id-789';
-    const mockResponseData = { message: 'Deleted' }; // Ответ API может отличаться
+    const mockResponseData = { message: 'Deleted' }; // пїЅпїЅпїЅпїЅпїЅ API пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     axios.delete.mockResolvedValue({ data: mockResponseData });
 
     const response = await BookService.deleteBook(bookId);
@@ -84,18 +84,22 @@ describe('BookService', () => {
     expect(response.data).toEqual(mockData);
   });
 
-  // Тест для isApiAvailable (если бы он использовался и был раскомментирован)
+  // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ isApiAvailable (пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
   // test('isApiAvailable should call health check endpoint', async () => {
-  //   axios.get.mockResolvedValue({ status: 200 }); // Мок успешного ответа health check
+  //   axios.get.mockResolvedValue({ status: 200 }); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ health check
   //   const available = await BookService.isApiAvailable();
   //   expect(axios.get).toHaveBeenCalledWith(`${API_URL}/health`, { timeout: 2000 });
   //   expect(available).toBe(true);
   // });
 
   // test('isApiAvailable should return false on error', async () => {
-  //   axios.get.mockRejectedValue(new Error('Network error')); // Мок ошибки health check
+  //   axios.get.mockRejectedValue(new Error('Network error')); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ health check
   //   const available = await BookService.isApiAvailable();
   //    expect(axios.get).toHaveBeenCalledWith(`${API_URL}/health`, { timeout: 2000 });
   //   expect(available).toBe(false);
   // });
+
+  test('BookService РѕРїСЂРµРґРµР»С‘РЅ', () => {
+    expect(BookService).toBeDefined();
+  });
 });

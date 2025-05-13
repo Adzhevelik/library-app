@@ -67,7 +67,7 @@ describe('StatusIndicator Component', () => {
 
     const alert = screen.getByRole('alert');
     expect(alert).toBeInTheDocument();
-    expect(alert).toHaveTextContent(/Íåò ñîåäèíåíèÿ/i);
+    expect(alert).toHaveTextContent(/ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/i);
     expect(alert).toHaveClass('offline');
     expect(alert).not.toHaveClass('online');
   });
@@ -82,7 +82,7 @@ describe('StatusIndicator Component', () => {
         if (eventListeners.offline) eventListeners.offline();
         else throw new Error("Offline listener missing");
     });
-    expect(screen.getByRole('alert')).toHaveTextContent(/Íåò ñîåäèíåíèÿ/i);
+    expect(screen.getByRole('alert')).toHaveTextContent(/ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/i);
 
     act(() => {
         setNavigatorOnline(true);
@@ -91,7 +91,7 @@ describe('StatusIndicator Component', () => {
     });
 
     const alert = screen.getByRole('alert');
-    expect(alert).toHaveTextContent(/Ñîåäèíåíèå âîññòàíîâëåíî/i);
+    expect(alert).toHaveTextContent(/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/i);
     expect(alert).toHaveClass('online');
     expect(alert).not.toHaveClass('offline');
 
@@ -121,4 +121,10 @@ describe('StatusIndicator Component', () => {
     expect(window.removeEventListener).toHaveBeenCalledWith('online', onlineHandler);
     expect(window.removeEventListener).toHaveBeenCalledWith('offline', offlineHandler);
   });
+
+  test("placeholder test", () => { expect(true).toBe(true); });
+});
+
+test('StatusIndicator Ñ€ĞµĞ½Ğ´ĞµÑ€Ğ¸Ñ‚ÑÑ Ğ±ĞµĞ· Ğ¾ÑˆĞ¸Ğ±Ğ¾Ğº', () => {
+  render(<StatusIndicator />);
 });

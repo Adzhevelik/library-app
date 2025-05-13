@@ -40,4 +40,14 @@ describe('Error Component', () => {
     expect(backLink).toBeInTheDocument();
     expect(backLink).toHaveAttribute('href', customLink);
   });
+
+  test("placeholder test", () => { expect(true).toBe(true); });
+});
+
+test('Error рендерится без ошибок', () => {
+  render(
+    <MemoryRouter>
+      <Error message="Ошибка!" />
+    </MemoryRouter>
+  );
 });

@@ -1,6 +1,6 @@
 import MockBookService from '../MockDataService';
 
-// Мокаем localStorage
+// пїЅпїЅпїЅпїЅпїЅпїЅ localStorage
 const localStorageMock = (() => {
   let store = {};
   return {
@@ -21,39 +21,39 @@ const localStorageMock = (() => {
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-// Используем фейковые таймеры
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 jest.useFakeTimers();
 
 describe('MockBookService', () => {
-  const initialBooksCount = 6; // Изначальное количество книг в моковых данных
+  const initialBooksCount = 6; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
   beforeEach(() => {
-    // Очищаем localStorage и сбрасываем таймеры перед каждым тестом
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ localStorage пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     localStorage.clear();
-    // Инициализируем localStorage с начальными данными (вызов любой функции сервиса сделает это)
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ localStorage пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ)
     MockBookService.getAllBooks();
-    jest.advanceTimersByTime(500); // Пропускаем setTimeout в getAllBooks
+    jest.advanceTimersByTime(500); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ setTimeout пїЅ getAllBooks
   });
 
   test('getAllBooks should return initial mock books from localStorage', async () => {
     const promise = MockBookService.getAllBooks();
-    jest.advanceTimersByTime(500); // Пропускаем setTimeout
+    jest.advanceTimersByTime(500); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ setTimeout
     const response = await promise;
 
     expect(response.data).toBeInstanceOf(Array);
     expect(response.data.length).toBe(initialBooksCount);
-    expect(response.data[0].title).toBe('Война и мир'); // Проверяем первую книгу
+    expect(response.data[0].title).toBe('пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ'); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
   });
 
   test('getBookById should return the correct book', async () => {
-    const bookId = '2'; // Мастер и Маргарита
+    const bookId = '2'; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     const promise = MockBookService.getBookById(bookId);
     jest.advanceTimersByTime(500);
     const response = await promise;
 
     expect(response.data).toBeDefined();
     expect(response.data.id).toBe(bookId);
-    expect(response.data.title).toBe('Мастер и Маргарита');
+    expect(response.data.title).toBe('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
   });
 
   test('getBookById should reject if book not found', async () => {
@@ -78,15 +78,15 @@ describe('MockBookService', () => {
       totalCopies: 1,
     };
     const createPromise = MockBookService.createBook(newBookData);
-    jest.advanceTimersByTime(700); // Пропускаем setTimeout
+    jest.advanceTimersByTime(700); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ setTimeout
     const createResponse = await createPromise;
 
     expect(createResponse.data).toBeDefined();
-    expect(createResponse.data.id).toBeDefined(); // ID должен быть сгенерирован
+    expect(createResponse.data.id).toBeDefined(); // ID пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     expect(createResponse.data.title).toBe(newBookData.title);
     expect(createResponse.data.createdAt).toBeDefined();
 
-    // Проверяем, что книга добавлена в localStorage
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ localStorage
     const getAllPromise = MockBookService.getAllBooks();
     jest.advanceTimersByTime(500);
     const getAllResponse = await getAllPromise;
@@ -97,7 +97,7 @@ describe('MockBookService', () => {
   });
 
   test('updateBook should modify the correct book in localStorage', async () => {
-    const bookIdToUpdate = '3'; // Преступление и наказание
+    const bookIdToUpdate = '3'; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     const updateData = {
       title: 'Updated Title',
       availableCopies: 0,
@@ -110,10 +110,10 @@ describe('MockBookService', () => {
     expect(updateResponse.data.id).toBe(bookIdToUpdate);
     expect(updateResponse.data.title).toBe(updateData.title);
     expect(updateResponse.data.availableCopies).toBe(updateData.availableCopies);
-    expect(updateResponse.data.author).toBe('Фёдор Достоевский'); // Остальные поля не должны измениться
+    expect(updateResponse.data.author).toBe('ФёпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     expect(updateResponse.data.updatedAt).toBeDefined();
 
-    // Проверяем localStorage
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ localStorage
     const getPromise = MockBookService.getBookById(bookIdToUpdate);
     jest.advanceTimersByTime(500);
     const getResponse = await getPromise;
@@ -135,25 +135,25 @@ describe('MockBookService', () => {
   test('deleteBook should remove the book from localStorage', async () => {
     const bookIdToDelete = '4'; // 1984
 
-    // Убедимся, что книга есть
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
     const getPromiseBefore = MockBookService.getBookById(bookIdToDelete);
      jest.advanceTimersByTime(500);
     await expect(getPromiseBefore).resolves.toBeDefined();
 
-    // Удаляем
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     const deletePromise = MockBookService.deleteBook(bookIdToDelete);
     jest.advanceTimersByTime(700);
     const deleteResponse = await deletePromise;
     expect(deleteResponse.data.message).toBe('Book deleted successfully');
 
-    // Проверяем, что книги больше нет
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
     const getPromiseAfter = MockBookService.getBookById(bookIdToDelete);
     jest.advanceTimersByTime(500);
     await expect(getPromiseAfter).rejects.toEqual({
       response: { data: { message: 'Book not found' } },
     });
 
-    // Проверяем общее количество
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
      const getAllPromise = MockBookService.getAllBooks();
      jest.advanceTimersByTime(500);
      const getAllResponse = await getAllPromise;
@@ -171,31 +171,31 @@ describe('MockBookService', () => {
   });
 
   test('searchBooks should find books by title', async () => {
-    const promise = MockBookService.searchBooks('мир'); // Война и мир
+    const promise = MockBookService.searchBooks('пїЅпїЅпїЅ'); // пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
     jest.advanceTimersByTime(700);
     const response = await promise;
 
     expect(response.data.length).toBe(1);
-    expect(response.data[0].title).toBe('Война и мир');
+    expect(response.data[0].title).toBe('пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ');
   });
 
    test('searchBooks should find books by author', async () => {
-    const promise = MockBookService.searchBooks('Толстой'); // Лев Толстой
+    const promise = MockBookService.searchBooks('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ'); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     jest.advanceTimersByTime(700);
     const response = await promise;
 
     expect(response.data.length).toBe(1);
-    expect(response.data[0].author).toBe('Лев Толстой');
+    expect(response.data[0].author).toBe('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
   });
 
    test('searchBooks should find books by genre (case-insensitive)', async () => {
-    const promise = MockBookService.searchBooks('фэнтези'); // Гарри Поттер, Властелин колец
+    const promise = MockBookService.searchBooks('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ'); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     jest.advanceTimersByTime(700);
     const response = await promise;
 
     expect(response.data.length).toBe(2);
     expect(response.data.map(b => b.title)).toEqual(
-        expect.arrayContaining(['Гарри Поттер и философский камень', 'Властелин колец'])
+        expect.arrayContaining(['пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ', 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ'])
     );
   });
 
@@ -216,4 +216,8 @@ describe('MockBookService', () => {
     expect(response.data).toEqual([]);
   });
 
+});
+
+test('MockDataService РѕРїСЂРµРґРµР»С‘РЅ', () => {
+  expect(MockBookService).toBeDefined();
 });

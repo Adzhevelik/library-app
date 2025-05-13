@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 
-// Мокаем дочерние компоненты и зависимости со стилями
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 jest.mock('../Header', () => () => <div data-testid="header">Header Mock</div>);
 jest.mock('../Footer', () => () => <div data-testid="footer">Footer Mock</div>);
 jest.mock('../BookList', () => () => <div data-testid="book-list">BookList Mock</div>);
@@ -19,7 +19,7 @@ jest.mock('react-toastify', () => ({
     error: jest.fn(),
   },
 }));
-// CSS будет обработан moduleNameMapper в package.json
+// CSS пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ moduleNameMapper пїЅ package.json
 
 describe('App Component Routing', () => {
   test('renders Header, Footer, and BookList on default route "/"', () => {
@@ -78,4 +78,12 @@ describe('App Component Routing', () => {
     );
     expect(screen.getByTestId('not-found')).toBeInTheDocument();
   });
+});
+
+test('App СЂРµРЅРґРµСЂРёС‚СЃСЏ Р±РµР· РѕС€РёР±РѕРє', () => {
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
 });

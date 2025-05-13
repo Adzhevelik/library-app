@@ -126,3 +126,7 @@ describe('Header Component', () => {
         });
     });
 });
+
+test('Header рендерится без ошибок', () => {
+  render(<Header />);
+});

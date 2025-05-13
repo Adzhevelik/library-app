@@ -6,7 +6,7 @@ import SearchBooks from '../SearchBooks';
 import BookService from '../BookService';
 import { toast } from 'react-toastify';
 
-// Ìîêàåì çàâèñèìîñòè
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 jest.mock('../BookService');
 jest.mock('react-toastify', () => ({
   toast: {
@@ -16,7 +16,7 @@ jest.mock('react-toastify', () => ({
   ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
-// Ìîêàåì ìîäàëêó óäàëåíèÿ
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 jest.mock('../DeleteBookModal', () => {
   // eslint-disable-next-line react/display-name
   return ({ book, isOpen, onClose, onSuccess }) => {
@@ -174,4 +174,12 @@ describe('SearchBooks Component', () => {
     expect(screen.getByText(mockSearchResults[0].title)).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 3 }).length).toBe(mockSearchResults.length);
   });
+});
+
+test('SearchBooks Ñ€ĞµĞ½Ğ´ĞµÑ€Ğ¸Ñ‚ÑÑ Ğ±ĞµĞ· Ğ¾ÑˆĞ¸Ğ±Ğ¾Ğº', () => {
+  render(
+    <MemoryRouter>
+      <SearchBooks />
+    </MemoryRouter>
+  );
 });

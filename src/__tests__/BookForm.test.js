@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import BookForm from '../BookForm';
 
 describe('BookForm Component', () => {
@@ -37,7 +38,7 @@ describe('BookForm Component', () => {
   test('renders all form fields with initial values', () => {
     render(<BookForm {...defaultProps} />);
 
-    // Èñïîëüçóåì getByLabelText òàì, ãäå ıòî íàäåæíî (ñâÿçü label/input åñòü)
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ getByLabelText ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ label/input ï¿½ï¿½ï¿½ï¿½)
     expect(screen.getByLabelText(/Title/i)).toHaveValue(mockBook.title);
     expect(screen.getByLabelText(/Author/i)).toHaveValue(mockBook.author);
     expect(screen.getByLabelText(/Description/i)).toHaveValue(mockBook.description);
@@ -124,7 +125,7 @@ describe('BookForm Component', () => {
   test('renders required indicators for title and author', () => {
     render(<BookForm {...defaultProps} />);
 
-    // Íàõîäèì label ïî òåêñòó è ïğîâåğÿåì íàëè÷èå span.required âíóòğè íåãî
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ label ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ span.required ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     const titleLabel = screen.getByText((content, element) => {
         return element.tagName.toLowerCase() === 'label' && element.getAttribute('for') === 'title';
     });
@@ -148,4 +149,12 @@ describe('BookForm Component', () => {
     // eslint-disable-next-line testing-library/no-node-access
     expect(descriptionLabel.querySelector('span.required')).not.toBeInTheDocument();
   });
+});
+
+test('BookForm Ñ€ĞµĞ½Ğ´ĞµÑ€Ğ¸Ñ‚ÑÑ Ğ±ĞµĞ· Ğ¾ÑˆĞ¸Ğ±Ğ¾Ğº', () => {
+  render(
+    <MemoryRouter>
+      <BookForm />
+    </MemoryRouter>
+  );
 });

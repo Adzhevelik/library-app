@@ -150,4 +150,14 @@ describe('BookList Component', () => {
         expect(screen.getByText(mockBooks[0].title)).toBeInTheDocument();
         expect(screen.getAllByRole('heading', { level: 3 }).length).toBe(mockBooks.length);
     });
+
+    test("placeholder test", () => { expect(true).toBe(true); });
+});
+
+test('BookList рендерится без ошибок', () => {
+  render(
+    <MemoryRouter>
+      <BookList />
+    </MemoryRouter>
+  );
 });

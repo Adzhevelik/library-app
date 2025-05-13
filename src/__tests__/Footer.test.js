@@ -1,14 +1,14 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react'; // Èñïğàâëåíî
-import Footer from '../Footer'; // Óáåäèòåñü, ÷òî ïóòü ïğàâèëüíûé
+import { render, screen } from '@testing-library/react'; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+import Footer from '../Footer'; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 describe('Footer Component', () => {
   it('should render the copyright notice with the current year', () => {
     render(<Footer />);
     const currentYear = new Date().getFullYear();
-    // Èñïîëüçóåì ïîèñê ïî ÷àñòè ñòğîêè, òàê êàê òåêñò âêëş÷àåò çíàê ©
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½
     expect(screen.getByText(/Library Management System/i)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(currentYear.toString()))).toBeInTheDocument(); // Ïğîâåğÿåì íàëè÷èå ãîäà
+    expect(screen.getByText(new RegExp(currentYear.toString()))).toBeInTheDocument(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     expect(screen.getByText(/Made by Dzhevelik Anastasiia and Adriyanova Victoria/i)).toBeInTheDocument();
   });
 
@@ -16,4 +16,8 @@ describe('Footer Component', () => {
     render(<Footer />);
     expect(screen.getByText(/DevOps Laboratory Work/i)).toBeInTheDocument();
   });
+});
+
+test('Footer Ñ€ĞµĞ½Ğ´ĞµÑ€Ğ¸Ñ‚ÑÑ Ğ±ĞµĞ· Ğ¾ÑˆĞ¸Ğ±Ğ¾Ğº', () => {
+  render(<Footer />);
 });

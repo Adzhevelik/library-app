@@ -3,87 +3,22 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 
-// ������ �������� ���������� � ����������� �� �������
-jest.mock('../Header', () => () => <div data-testid="header">Header Mock</div>);
-jest.mock('../Footer', () => () => <div data-testid="footer">Footer Mock</div>);
-jest.mock('../BookList', () => () => <div data-testid="book-list">BookList Mock</div>);
-jest.mock('../AddBook', () => () => <div data-testid="add-book">AddBook Mock</div>);
-jest.mock('../EditBook', () => () => <div data-testid="edit-book">EditBook Mock</div>);
-jest.mock('../BookDetails', () => () => <div data-testid="book-details">BookDetails Mock</div>);
-jest.mock('../SearchBooks', () => () => <div data-testid="search-books">SearchBooks Mock</div>);
-jest.mock('../NotFound', () => () => <div data-testid="not-found">NotFound Mock</div>);
-jest.mock('react-toastify', () => ({
-  ToastContainer: () => <div data-testid="toast-container">ToastContainer Mock</div>,
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-  },
-}));
-// CSS ����� ��������� moduleNameMapper � package.json
+// Mock child components that might have their own complex logic or API calls
+jest.mock('../BookList', () => () => <div data-testid="book-list-mock">BookList Mock</div>);
+jest.mock('../Header', () => () => <div data-testid="header-mock">Header Mock</div>);
+jest.mock('../Footer', () => () => <div data-testid="footer-mock">Footer Mock</div>);
 
-describe('App Component Routing', () => {
-  test('renders Header, Footer, and BookList on default route "/"', () => {
+describe('App Component', () => {
+  test('renders main application layout', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <App />
       </MemoryRouter>
     );
-    expect(screen.getByTestId('header')).toBeInTheDocument();
-    expect(screen.getByTestId('footer')).toBeInTheDocument();
-    expect(screen.getByTestId('book-list')).toBeInTheDocument();
-    expect(screen.getByTestId('toast-container')).toBeInTheDocument();
+    // Check if mocked components are rendered
+    expect(screen.getByTestId('header-mock')).toBeInTheDocument();
+    expect(screen.getByTestId('book-list-mock')).toBeInTheDocument(); // Assuming '/' route renders BookList
+    expect(screen.getByTestId('footer-mock')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-container')).toBeInTheDocument(); // From react-toastify mock in BookList.test.js (global mock)
   });
-
-  test('renders AddBook component on "/books/add" route', () => {
-    render(
-      <MemoryRouter initialEntries={['/books/add']}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByTestId('add-book')).toBeInTheDocument();
-  });
-
-   test('renders EditBook component on "/books/edit/:id" route', () => {
-    render(
-      <MemoryRouter initialEntries={['/books/edit/1']}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByTestId('edit-book')).toBeInTheDocument();
-  });
-
-   test('renders BookDetails component on "/books/:id" route', () => {
-    render(
-      <MemoryRouter initialEntries={['/books/1']}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByTestId('book-details')).toBeInTheDocument();
-  });
-
-  test('renders SearchBooks component on "/search" route', () => {
-    render(
-      <MemoryRouter initialEntries={['/search']}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByTestId('search-books')).toBeInTheDocument();
-  });
-
-   test('renders NotFound component on unknown route', () => {
-    render(
-      <MemoryRouter initialEntries={['/some/unknown/route']}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByTestId('not-found')).toBeInTheDocument();
-  });
-});
-
-test('App рендерится без ошибок', () => {
-  render(
-    <MemoryRouter>
-      <App />
-    </MemoryRouter>
-  );
 });

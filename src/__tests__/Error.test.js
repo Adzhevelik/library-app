@@ -12,7 +12,8 @@ describe('Error Component', () => {
       </MemoryRouter>
     );
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
-    expect(screen.getByText('??')).toBeInTheDocument();
+    // В твоем компоненте Error.js есть иконка ⚠️, а не ??
+    expect(screen.getByText('⚠️')).toBeInTheDocument(); 
   });
 
   test('renders the default back link correctly', () => {
@@ -40,14 +41,4 @@ describe('Error Component', () => {
     expect(backLink).toBeInTheDocument();
     expect(backLink).toHaveAttribute('href', customLink);
   });
-
-  test("placeholder test", () => { expect(true).toBe(true); });
-});
-
-test('Error рендерится без ошибок', () => {
-  render(
-    <MemoryRouter>
-      <Error message="Ошибка!" />
-    </MemoryRouter>
-  );
 });

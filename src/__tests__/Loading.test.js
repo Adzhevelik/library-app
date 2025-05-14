@@ -7,7 +7,9 @@ describe('Loading Component', () => {
     render(<Loading />);
     
     expect(screen.getByText('Loading...')).toBeInTheDocument();
-    expect(screen.getByClassName('spinner')).toBeInTheDocument();
+    // Используем querySelector вместо getByClassName
+    const spinner = document.querySelector('.spinner');
+    expect(spinner).toBeInTheDocument();
   });
 
   it('должен отображать пользовательское сообщение', () => {
@@ -16,6 +18,8 @@ describe('Loading Component', () => {
     render(<Loading message={customMessage} />);
     
     expect(screen.getByText(customMessage)).toBeInTheDocument();
-    expect(screen.getByClassName('spinner')).toBeInTheDocument();
+    // Используем querySelector вместо getByClassName
+    const spinner = document.querySelector('.spinner');
+    expect(spinner).toBeInTheDocument();
   });
 });

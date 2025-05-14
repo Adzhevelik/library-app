@@ -18,24 +18,18 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.5.2",
-    "jest-environment-jsdom": "^29.7.0",
     "jest-junit": "^16.0.0",
-    "jest-mock-extended": "^3.0.5",
-    "msw": "^2.0.13",
     "supertest": "^6.3.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:watchAll": "react-scripts test --watchAll",
-    "test:ci": "react-scripts test --watchAll=false --testPathIgnorePatterns=\"src/__tests__/(MockDataService|StatusIndicator)\\.test\\.js\" || true",
-    "test:coverage": "react-scripts test --watchAll=false --coverage --coverageReporters=text-summary || true",
-    "test:all": "react-scripts test --watchAll=false",
-    "test:backend": "echo 'Backend tests completed successfully'",
+    "test:ci": "react-scripts test --watchAll=false --testPathIgnorePatterns=\"src/__tests__/(MockDataService)\\.test\\.js\" || true",
+    "test:coverage": "react-scripts test --watchAll=false --coverage",
+    "test:backend": "echo 'No backend tests configured yet'",
     "eject": "react-scripts eject",
-    "lint": "eslint src --ext .js,.jsx || true",
-    "format": "prettier --write src/*/.{js,jsx} || true"
+    "lint": "eslint src --ext .js,.jsx || true"
   },
   "eslintConfig": {
     "extends": [
@@ -65,8 +59,7 @@
     ],
     "coverageReporters": [
       "text",
-      "text-summary",
-      "json-summary"
+      "text-summary"
     ],
     "moduleNameMapper": {
       "\\.(css|less|sass|scss)$": "<rootDir>/src/mocks/styleMock.js",
@@ -74,7 +67,6 @@
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!axios)/"
-    ],
-    "testEnvironment": "jsdom"
+    ]
   }
 }

@@ -3,10 +3,30 @@ import { render, screen } from '@testing-library/react';
 import Footer from '../Footer';
 
 describe('Footer Component', () => {
-  test('renders footer with copyright and author info', () => {
+  beforeEach(() => {
+    // Мокируем new Date() для получения постоянного года
+    jest.spyOn(global.Date, 'now').mockImplementation(() => new Date('2023-01-01').valueOf());
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('должен отображать информацию о копирайте с текущим годом', () => {
     render(<Footer />);
-    const currentYear = new Date().getFullYear();
-    expect(screen.getByText(`В© ${currentYear} Library Management System. Made by Dzhevelik Anastasiia and Adriyanova Victoria.`)).toBeInTheDocument();
-    expect(screen.getByText(/DevOps Laboratory Work/i)).toBeInTheDocument();
+    
+    expect(screen.getByText(/© 2023 Library Management System/)).toBeInTheDocument();
+  });
+
+  it('должен отображать имена авторов', () => {
+    render(<Footer />);
+    
+    expect(screen.getByText(/Made by Dzhevelik Anastasiia and Adriyanova Victoria/)).toBeInTheDocument();
+  });
+
+  it('должен отображать информацию о лабораторной работе', () => {
+    render(<Footer />);
+    
+    expect(screen.getByText('DevOps Laboratory Work')).toBeInTheDocument();
   });
 });

@@ -1,55 +1,93 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import StatusIndicator from '../StatusIndicator'; // РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ РїСѓС‚СЊ РїСЂР°РІРёР»СЊРЅС‹Р№
-
-// Р“Р»РѕР±Р°Р»СЊРЅРѕ РјРѕРєР°РµРј fetch РґР»СЏ СЌС‚РѕРіРѕ С„Р°Р№Р»Р° С‚РµСЃС‚РѕРІ
-global.fetch = jest.fn();
+import { render, screen, act } from '@testing-library/react';
+import StatusIndicator from '../StatusIndicator';
 
 describe('StatusIndicator Component', () => {
   beforeEach(() => {
-    fetch.mockClear();
+    jest.useFakeTimers();
+    
+    // Мокируем navigator.onLine
+    Object.defineProperty(navigator, 'onLine', {
+      configurable: true,
+      value: true
+    });
+    
+    // Мокируем слушатели событий
+    window.addEventListener = jest.fn();
+    window.removeEventListener = jest.fn();
   });
 
-  test('renders and shows initial "Checking status..." message', () => {
-    // РњРѕРєР°РµРј fetch С‚Р°Рє, С‡С‚РѕР±С‹ РѕРЅ РЅРµ СЂР°Р·СЂРµС€Р°Р»СЃСЏ СЃСЂР°Р·Сѓ, С‡С‚РѕР±С‹ СѓРІРёРґРµС‚СЊ РЅР°С‡Р°Р»СЊРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
-    fetch.mockImplementationOnce(() => new Promise(() => {}));
-    render(<StatusIndicator />);
-    // РџСЂРµРґРїРѕР»Р°РіР°РµРј, С‡С‚Рѕ РєРѕРјРїРѕРЅРµРЅС‚ StatusIndicator.js СЂРµРЅРґРµСЂРёС‚ С‚Р°РєРѕР№ С‚РµРєСЃС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
-    // Р•СЃР»Рё С‚РµРєСЃС‚ РґСЂСѓРіРѕР№, РїРѕРїСЂР°РІСЊ РµРіРѕ Р·РґРµСЃСЊ.
-    // Р•СЃР»Рё StatusIndicator.js РІРѕР·РІСЂР°С‰Р°РµС‚ null РёР»Рё РїСѓСЃС‚РѕР№ div РґРѕ РїРµСЂРІРѕРіРѕ fetch, СЌС‚РѕС‚ С‚РµСЃС‚ РЅР°РґРѕ РёР·РјРµРЅРёС‚СЊ.
-    // РЎСѓРґСЏ РїРѕ СЃС‚СЂСѓРєС‚СѓСЂРµ, РѕРЅ РґРѕР»Р¶РµРЅ С‡С‚Рѕ-С‚Рѕ СЂРµРЅРґРµСЂРёС‚СЊ СЃСЂР°Р·Сѓ.
-    // РќР°РїСЂРёРјРµСЂ, РµСЃР»Рё Сѓ С‚РµР±СЏ С‚Р°РєРѕР№ РєРѕРјРїРѕРЅРµРЅС‚:
-    // const StatusIndicator = () => { const [status, setStatus] = useState('Checking...'); ... return <div>{status}</div>; }
-    // РўРѕ С‚РµРєСЃС‚ Р±СѓРґРµС‚ "Checking..."
-    // Р•СЃР»Рё РѕРЅ РІС‹РІРѕРґРёС‚ "API Status: Checking...", С‚Рѕ screen.getByText(/API Status: Checking.../i)
-    // Р§С‚РѕР±С‹ С‚РµСЃС‚ Р±С‹Р» РјР°РєСЃРёРјР°Р»СЊРЅРѕ РїСЂРѕСЃС‚С‹Рј, РїСЂРѕРІРµСЂРёРј, С‡С‚Рѕ РѕРЅ РїСЂРѕСЃС‚Рѕ С‡С‚Рѕ-С‚Рѕ СЂРµРЅРґРµСЂРёС‚
-    const { container } = render(<StatusIndicator />);
-    expect(container.firstChild).toBeInTheDocument(); 
-    // РњРѕР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ Р±РѕР»РµРµ РєРѕРЅРєСЂРµС‚РЅСѓСЋ РїСЂРѕРІРµСЂРєСѓ, РµСЃР»Рё РµСЃС‚СЊ РЅР°С‡Р°Р»СЊРЅС‹Р№ С‚РµРєСЃС‚
-    // РќР°РїСЂРёРјРµСЂ, РµСЃР»Рё РµСЃС‚СЊ <div className="status-indicator">...</div>
-    // expect(container.querySelector('.status-indicator')).toBeInTheDocument();
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
-  test('shows online status after successful fetch', async () => {
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ message: 'API is operational' }), // РЎС‚СЂСѓРєС‚СѓСЂР° РѕС‚РІРµС‚Р° РґРѕР»Р¶РЅР° СЃРѕРІРїР°РґР°С‚СЊ СЃ РѕР¶РёРґР°РµРјРѕР№ РІ РєРѕРјРїРѕРЅРµРЅС‚Рµ
-    });
+  it('должен регистрировать слушатели событий при монтировании', () => {
     render(<StatusIndicator />);
-    // Р—Р°РјРµРЅРё 'Online' РёР»Рё 'API is operational' РЅР° С‚РѕС‚ С‚РµРєСЃС‚, РєРѕС‚РѕСЂС‹Р№ СЂРµР°Р»СЊРЅРѕ РІС‹РІРѕРґРёС‚СЃСЏ
-    await waitFor(() => {
-      // РўРµРєСЃС‚ РјРѕР¶РµС‚ Р±С‹С‚СЊ С‡Р°СЃС‚СЊСЋ Р±РѕР»СЊС€РµРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ, РЅР°РїСЂРёРјРµСЂ "API Status: Online"
-      // РСЃРїРѕР»СЊР·СѓР№ СЂРµРіСѓР»СЏСЂРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ РґР»СЏ РіРёР±РєРѕСЃС‚Рё
-      expect(screen.getByText(/API is operational/i)).toBeInTheDocument(); 
-    });
+    
+    expect(window.addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
+    expect(window.addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
   });
 
-  test('shows offline status after failed fetch', async () => {
-    fetch.mockResolvedValueOnce({ ok: false }); // РР»Рё mockRejectedValueOnce
-    render(<StatusIndicator />);
-    // Р—Р°РјРµРЅРё 'Offline' РЅР° С‚РѕС‚ С‚РµРєСЃС‚, РєРѕС‚РѕСЂС‹Р№ СЂРµР°Р»СЊРЅРѕ РІС‹РІРѕРґРёС‚СЃСЏ РїСЂРё РѕС€РёР±РєРµ
-    await waitFor(() => {
-      expect(screen.getByText(/Offline/i)).toBeInTheDocument();
+  it('должен удалять слушатели событий при размонтировании', () => {
+    const { unmount } = render(<StatusIndicator />);
+    
+    unmount();
+    
+    expect(window.removeEventListener).toHaveBeenCalledWith('online', expect.any(Function));
+    expect(window.removeEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
+  });
+
+  it('не должен отображаться изначально, если онлайн', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      configurable: true,
+      value: true
     });
+    
+    render(<StatusIndicator />);
+    
+    expect(screen.queryByText(/Соединение восстановлено/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Нет соединения/)).not.toBeInTheDocument();
+  });
+
+  it('должен отображать оффлайн-сообщение, если нет соединения', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      configurable: true,
+      value: false
+    });
+    
+    render(<StatusIndicator />);
+    
+    expect(screen.getByText(/Нет соединения/)).toBeInTheDocument();
+    expect(screen.getByText(/Используются локальные данные/)).toBeInTheDocument();
+  });
+
+  it('должен отображать онлайн-сообщение при восстановлении соединения и скрывать его через 3 секунды', () => {
+    const { rerender } = render(<StatusIndicator />);
+    
+    // Симулируем событие online
+    Object.defineProperty(navigator, 'onLine', {
+      configurable: true,
+      value: true
+    });
+    
+    // Вызываем обработчик события 'online'
+    const onlineHandler = window.addEventListener.mock.calls.find(call => call[0] === 'online')[1];
+    act(() => {
+      onlineHandler();
+    });
+    
+    rerender(<StatusIndicator />);
+    
+    expect(screen.getByText(/Соединение восстановлено/)).toBeInTheDocument();
+    expect(screen.getByText(/Данные будут синхронизированы/)).toBeInTheDocument();
+    
+    // Проверяем, что сообщение исчезнет через 3 секунды
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+    
+    rerender(<StatusIndicator />);
+    
+    expect(screen.queryByText(/Соединение восстановлено/)).not.toBeInTheDocument();
   });
 });

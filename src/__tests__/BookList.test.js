@@ -1,99 +1,207 @@
-// src/__tests__/BookList.test.js
-
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react'; // Добавил waitFor
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import BookList from '../BookList';
-import BookService from '../BookService'; // Убедись, что этот импорт есть
-import { toast } from 'react-toastify';   // И этот, если используешь toast в BookList
+import BookService from '../BookService';
 
-// Мок для BookService
-jest.mock('../BookService', () => ({
-    getAllBooks: jest.fn(), // Инициализируем как jest.fn()
-    deleteBook: jest.fn(),  // Инициализируем как jest.fn()
-    // Добавь остальные функции из BookService, если они вызываются в BookList
-}));
-
-// Мок для react-toastify
+// Мокируем зависимости
 jest.mock('react-toastify', () => ({
   toast: {
     success: jest.fn(),
-    error: jest.fn(),
-  },
-  ToastContainer: () => <div data-testid="toast-container"/>, // Для рендера ToastContainer в App
+    error: jest.fn()
+  }
 }));
 
+jest.mock('../BookService', () => ({
+  getAllBooks: jest.fn(),
+  deleteBook: jest.fn()
+}));
 
 describe('BookList Component', () => {
+  const mockBooks = [
+    {
+      id: 1,
+      title: 'Книга 1',
+      author: 'Автор 1',
+      description: 'Описание книги 1',
+      genre: 'Фантастика',
+      availableCopies: 2,
+      totalCopies: 3
+    },
+    {
+      id: 2,
+      title: 'Книга 2',
+      author: 'Автор 2',
+      description: 'Описание книги 2',
+      genre: 'Роман',
+      availableCopies: 1,
+      totalCopies: 4
+    }
+  ];
+
   beforeEach(() => {
-    // Очищаем вызовы моков перед каждым тестом
-    BookService.getAllBooks.mockClear();
-    BookService.deleteBook.mockClear();
-    toast.success.mockClear();
-    toast.error.mockClear();
+    jest.clearAllMocks();
+    
+    // Возвращаем мокированные данные по умолчанию
+    BookService.getAllBooks.mockResolvedValue({ data: mockBooks });
+    BookService.deleteBook.mockResolvedValue({});
 
-    // Дефолтный успешный ответ для getAllBooks
-    // (можно переопределить в конкретных тестах)
+    // Мокируем модальное окно для удаления
+    jest.spyOn(global, 'confirm').mockImplementation(() => true);
+  });
+
+  it('должен отображать список книг после загрузки', async () => {
+    render(
+      <MemoryRouter>
+        <BookList />
+      </MemoryRouter>
+    );
+
+    // Сначала должен отображаться индикатор загрузки
+    expect(screen.getByText('Loading books...')).toBeInTheDocument();
+
+    // После загрузки должны отображаться книги
+    await waitFor(() => {
+      expect(screen.queryByText('Loading books...')).not.toBeInTheDocument();
+      expect(screen.getByText('Book Library')).toBeInTheDocument();
+      expect(screen.getByText('Total Books: 2')).toBeInTheDocument();
+      expect(screen.getByText('Книга 1')).toBeInTheDocument();
+      expect(screen.getByText('Книга 2')).toBeInTheDocument();
+    });
+  });
+
+  it('должен отображать сообщение, если книги не найдены', async () => {
     BookService.getAllBooks.mockResolvedValue({ data: [] });
-  });
-
-  test('renders loading state initially and then book library title if no books', async () => {
-    // BookService.getAllBooks уже мокнут в beforeEach на возврат пустого массива
-    render(
-        <MemoryRouter>
-            <BookList />
-        </MemoryRouter>
-    );
-
-    // Сначала проверяем состояние загрузки (если оно есть и видимо)
-    // Если загрузка очень быстрая, этот expect может не успеть.
-    // Если твой компонент явно показывает "Loading books...", то это должно работать.
-    // Если нет, можно убрать эту проверку.
-    // expect(screen.getByText(/Loading books.../i)).toBeInTheDocument();
-
-    // Ждем, пока компонент отрендерит контент после загрузки
-    expect(await screen.findByRole('heading', { name: /Book Library/i })).toBeInTheDocument();
-    expect(BookService.getAllBooks).toHaveBeenCalledTimes(1);
-    // Если книг нет, должен быть соответствующий текст
-    expect(screen.getByText(/No books found/i)).toBeInTheDocument();
-    // Проверяем ссылку на добавление книги
-    expect(screen.getByRole('link', { name: /Add a new book/i })).toBeInTheDocument();
-  });
-
-  test('displays books when data is fetched', async () => {
-    const mockBooksData = [
-      { id: '1', title: 'Test Book 1', author: 'Author 1', description: 'Desc 1', genre: 'Fiction', availableCopies: 1, totalCopies: 1 },
-      { id: '2', title: 'Test Book 2', author: 'Author 2', description: 'Desc 2', genre: 'Sci-Fi', availableCopies: 0, totalCopies: 2 },
-    ];
-    BookService.getAllBooks.mockResolvedValueOnce({ data: mockBooksData });
 
     render(
-        <MemoryRouter>
-            <BookList />
-        </MemoryRouter>
+      <MemoryRouter>
+        <BookList />
+      </MemoryRouter>
     );
 
-    // Ждем появления заголовков книг
-    expect(await screen.findByText(mockBooksData[0].title)).toBeInTheDocument();
-    expect(screen.getByText(mockBooksData[1].title)).toBeInTheDocument();
-    expect(screen.getByText(`by ${mockBooksData[0].author}`)).toBeInTheDocument();
-    expect(screen.getByText(`by ${mockBooksData[1].author}`)).toBeInTheDocument();
-    expect(screen.getByText(`Total Books: ${mockBooksData.length}`)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('No books found.')).toBeInTheDocument();
+      expect(screen.getByText('Add a new book')).toBeInTheDocument();
+    });
   });
 
-  test('displays error message if fetching books fails', async () => {
-    BookService.getAllBooks.mockRejectedValueOnce(new Error('Network Error'));
+  it('должен отображать ошибку, если не удалось загрузить книги', async () => {
+    BookService.getAllBooks.mockRejectedValue(new Error('Ошибка загрузки'));
+
     render(
-        <MemoryRouter>
-            <BookList />
-        </MemoryRouter>
+      <MemoryRouter>
+        <BookList />
+      </MemoryRouter>
     );
 
-    // Ждем сообщение об ошибке (текст зависит от твоего компонента)
-    expect(await screen.findByText(/Failed to load books/i)).toBeInTheDocument();
-    // И проверяем, что был вызван toast.error
-    expect(toast.error).toHaveBeenCalledWith('Failed to load books');
+    await waitFor(() => {
+      expect(screen.getByText('Failed to load books. Please try again later.')).toBeInTheDocument();
+      expect(toast.error).toHaveBeenCalledWith('Failed to load books');
+    });
   });
 
-  // Здесь можно добавить тесты на удаление книги, если хочешь
+  it('должен открывать модальное окно удаления при нажатии на кнопку Delete', async () => {
+    render(
+      <MemoryRouter>
+        <BookList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading books...')).not.toBeInTheDocument();
+    });
+
+    // Нажимаем на кнопку удаления для первой книги
+    const deleteButtons = screen.getAllByText('Delete');
+    fireEvent.click(deleteButtons[0]);
+
+    // Проверяем, что модальное окно удаления открылось
+    expect(screen.getByText('Are you sure you want to delete the book')).toBeInTheDocument();
+    expect(screen.getByText(/Книга 1/)).toBeInTheDocument(); // В заголовке модального окна должно быть название книги
+  });
+
+  it('должен удалять книгу и обновлять список после подтверждения в модальном окне', async () => {
+    render(
+      <MemoryRouter>
+        <BookList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading books...')).not.toBeInTheDocument();
+    });
+
+    // Нажимаем на кнопку удаления для первой книги
+    const deleteButtons = screen.getAllByText('Delete');
+    fireEvent.click(deleteButtons[0]);
+
+    // В модальном окне нажимаем на кнопку удаления
+    const confirmDeleteButton = screen.getAllByText('Delete')[2]; // Третья кнопка Delete (в модальном окне)
+    fireEvent.click(confirmDeleteButton);
+
+    await waitFor(() => {
+      expect(BookService.deleteBook).toHaveBeenCalledWith(1);
+      expect(toast.success).toHaveBeenCalledWith('Book deleted successfully');
+    });
+  });
+
+  it('должен закрывать модальное окно при нажатии на кнопку Cancel', async () => {
+    render(
+      <MemoryRouter>
+        <BookList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading books...')).not.toBeInTheDocument();
+    });
+
+    // Нажимаем на кнопку удаления для первой книги
+    const deleteButtons = screen.getAllByText('Delete');
+    fireEvent.click(deleteButtons[0]);
+
+    // Проверяем, что модальное окно открылось
+    expect(screen.getByText('Are you sure you want to delete the book')).toBeInTheDocument();
+
+    // Нажимаем на кнопку отмены в модальном окне
+    fireEvent.click(screen.getByText('Cancel'));
+
+    // Проверяем, что модальное окно закрылось
+    await waitFor(() => {
+      expect(screen.queryByText('Are you sure you want to delete the book')).not.toBeInTheDocument();
+    });
+
+    // Проверяем, что функция удаления не была вызвана
+    expect(BookService.deleteBook).not.toHaveBeenCalled();
+  });
+
+  it('должен отображать ошибку, если не удалось удалить книгу', async () => {
+    const error = new Error('Ошибка удаления');
+    error.response = { data: { message: 'Не удалось удалить книгу' } };
+    BookService.deleteBook.mockRejectedValue(error);
+
+    render(
+      <MemoryRouter>
+        <BookList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading books...')).not.toBeInTheDocument();
+    });
+
+    // Нажимаем на кнопку удаления для первой книги
+    const deleteButtons = screen.getAllByText('Delete');
+    fireEvent.click(deleteButtons[0]);
+
+    // В модальном окне нажимаем на кнопку удаления
+    const confirmDeleteButton = screen.getAllByText('Delete')[2]; // Третья кнопка Delete (в модальном окне)
+    fireEvent.click(confirmDeleteButton);
+
+    await waitFor(() => {
+      expect(BookService.deleteBook).toHaveBeenCalledWith(1);
+      expect(toast.error).toHaveBeenCalledWith('Не удалось удалить книгу');
+    });
+  });
 });

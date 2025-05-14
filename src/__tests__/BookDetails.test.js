@@ -1,135 +1,224 @@
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import BookDetails from '../BookDetails'; // Предполагается, что DeleteBookModal находится в этом же файле или импортируется в него
-import BookService from '../BookService';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import BookDetails from '../BookDetails';
+import BookService from '../BookService';
 
-// Мок для useNavigate
-const mockNavigate = jest.fn();
+// Мокируем зависимости
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => ({ id: '1' }), // Мокаем useParams, чтобы всегда был id '1' для тестов
-  useNavigate: () => mockNavigate,
+  useParams: () => ({ id: '1' }),
+  useNavigate: () => jest.fn()
 }));
 
-// Мок для BookService
-jest.mock('../BookService');
-
-// Мок для react-toastify
 jest.mock('react-toastify', () => ({
   toast: {
     success: jest.fn(),
-    error: jest.fn(),
-  },
-  ToastContainer: () => <div data-testid="toast-container" />,
+    error: jest.fn()
+  }
 }));
 
-const mockBook = {
-  id: '1',
-  title: 'The Great Test Book',
-  author: 'Test Author Supreme',
-  description: 'A very detailed description of a great test book.',
-  publicationDate: '2023-01-15',
-  isbn: '978-3-16-148410-0',
-  genre: 'Testing',
-  availableCopies: 3,
-  totalCopies: 5,
-  createdAt: '2023-01-01T10:00:00.000Z',
-  updatedAt: '2023-01-10T12:00:00.000Z',
-};
+jest.mock('../BookService', () => ({
+  getBookById: jest.fn(),
+  deleteBook: jest.fn()
+}));
 
 describe('BookDetails Component', () => {
-  const user = userEvent.setup({ delay: null }); // delay: null для ускорения userEvent в тестах
+  const mockBook = {
+    id: 1,
+    title: 'Тестовая книга',
+    author: 'Тестовый автор',
+    description: 'Описание тестовой книги',
+    publicationDate: '2023-01-01T00:00:00.000Z',
+    isbn: '1234567890123',
+    genre: 'Фантастика',
+    availableCopies: 2,
+    totalCopies: 5
+  };
+
+  let navigateMock;
 
   beforeEach(() => {
+    navigateMock = jest.fn();
+    jest.spyOn(require('react-router-dom'), 'useNavigate').mockImplementation(() => navigateMock);
     jest.clearAllMocks();
-    BookService.getBookById.mockResolvedValue({ data: { ...mockBook } });
-    BookService.deleteBook.mockResolvedValue({ data: { message: 'Book deleted successfully' } });
+    
+    // Устанавливаем мокированные данные по умолчанию
+    BookService.getBookById.mockResolvedValue({ data: mockBook });
+    BookService.deleteBook.mockResolvedValue({});
   });
 
-  const renderComponent = () => {
+  it('должен отображать индикатор загрузки при загрузке данных книги', () => {
     render(
-      <MemoryRouter initialEntries={['/books/1']}>
-        <Routes>
-          <Route path="/books/:id" element={<BookDetails />} />
-        </Routes>
+      <MemoryRouter>
+        <BookDetails />
       </MemoryRouter>
     );
-  }
 
-  test('renders loading state then book details', async () => {
-    renderComponent();
-    expect(screen.getByText(/Loading book details.../i)).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: mockBook.title })).toBeInTheDocument();
-    expect(screen.getByText(`Author: ${mockBook.author}`)).toBeInTheDocument(); // Уточнил текст
-    expect(screen.getByText(mockBook.description)).toBeInTheDocument();
-    expect(screen.getByText(`ISBN: ${mockBook.isbn}`)).toBeInTheDocument(); // Уточнил текст
-    expect(BookService.getBookById).toHaveBeenCalledWith('1');
+    expect(screen.getByText('Loading book details...')).toBeInTheDocument();
   });
 
-  test('shows error message if fetching book details fails', async () => {
-    BookService.getBookById.mockRejectedValueOnce(new Error('Failed to fetch details'));
-    renderComponent();
-    // Текст ошибки изменен в компоненте, когда book null
-    expect(await screen.findByText(/Failed to load book details. The book might not exist or has been removed./i)).toBeInTheDocument();
-    expect(toast.error).toHaveBeenCalledWith('Failed to load book details');
-  });
-
-  test('opens delete confirmation modal and deletes book', async () => {
-    renderComponent();
-    await screen.findByRole('heading', { name: mockBook.title });
-
-    // Кнопка на странице деталей
-    const pageDeleteButton = screen.getByRole('button', { name: /^Delete$/i }); // Текст кнопки "Delete"
-    await act(async () => {
-        await user.click(pageDeleteButton);
-    });
-
-    // Модальное окно должно появиться, заголовок "Delete Book"
-    expect(await screen.findByRole('heading', { name: /Delete Book/i, level: 3 })).toBeInTheDocument(); // Уточнил селектор модалки
-    expect(screen.getByText(`Are you sure you want to delete the book "${mockBook.title}"?`)).toBeInTheDocument();
-
-    // Кнопка подтверждения в модалке, тоже "Delete"
-    const modalConfirmDeleteButton = within(screen.getByRole('dialog')).getByRole('button', { name: /^Delete$/i });
-    await act(async () => {
-        await user.click(modalConfirmDeleteButton);
-    });
+  it('должен загружать и отображать детали книги', async () => {
+    render(
+      <MemoryRouter>
+        <BookDetails />
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
-        expect(BookService.deleteBook).toHaveBeenCalledWith('1');
+      expect(BookService.getBookById).toHaveBeenCalledWith('1');
+      expect(screen.queryByText('Loading book details...')).not.toBeInTheDocument();
+      expect(screen.getByText('Book Details')).toBeInTheDocument();
+      expect(screen.getByText('Тестовая книга')).toBeInTheDocument();
+      expect(screen.getByText(/Тестовый автор/)).toBeInTheDocument();
+      expect(screen.getByText('Описание тестовой книги')).toBeInTheDocument();
+      expect(screen.getByText(/Фантастика/)).toBeInTheDocument();
+      expect(screen.getByText(/1234567890123/)).toBeInTheDocument();
     });
-    expect(toast.success).toHaveBeenCalledWith('Book deleted successfully');
-    expect(mockNavigate).toHaveBeenCalledWith('/books');
   });
 
-  test('closes delete modal on cancel', async () => {
-    renderComponent();
-    await screen.findByRole('heading', { name: mockBook.title });
+  it('должен отображать ошибку, если не удалось загрузить данные книги', async () => {
+    const error = new Error('Ошибка загрузки');
+    BookService.getBookById.mockRejectedValue(error);
 
-    const pageDeleteButton = screen.getByRole('button', { name: /^Delete$/i });
-     await act(async () => {
-        await user.click(pageDeleteButton);
-    });
-    
-    const modalTitle = await screen.findByRole('heading', { name: /Delete Book/i, level: 3 });
-    expect(modalTitle).toBeInTheDocument();
-    
-    // Кнопка отмены в модалке
-    const modalCancelButton = within(screen.getByRole('dialog')).getByRole('button', { name: /Cancel/i });
-     await act(async () => {
-        await user.click(modalCancelButton);
-    });
+    render(
+      <MemoryRouter>
+        <BookDetails />
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
-        // Проверяем, что модальное окно (по его заголовку) исчезло
-        expect(screen.queryByRole('heading', { name: /Delete Book/i, level: 3 })).not.toBeInTheDocument();
+      expect(BookService.getBookById).toHaveBeenCalledWith('1');
+      expect(screen.queryByText('Loading book details...')).not.toBeInTheDocument();
+      expect(screen.getByText('Failed to load book details. The book might not exist or has been removed.')).toBeInTheDocument();
+      expect(toast.error).toHaveBeenCalledWith('Failed to load book details');
     });
   });
 
-  // Добавим helper 'within' из testing-library, если еще не импортирован
+  it('должен открывать модальное окно удаления при нажатии на кнопку Delete', async () => {
+    render(
+      <MemoryRouter>
+        <BookDetails />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading book details...')).not.toBeInTheDocument();
+    });
+
+    // Нажимаем на кнопку удаления
+    fireEvent.click(screen.getByText('Delete'));
+
+    // Проверяем, что модальное окно удаления открылось
+    expect(screen.getByText('Are you sure you want to delete the book')).toBeInTheDocument();
+    expect(screen.getByText(/"Тестовая книга"/)).toBeInTheDocument();
+  });
+
+  it('должен удалять книгу и перенаправлять на страницу списка книг', async () => {
+    render(
+      <MemoryRouter>
+        <BookDetails />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading book details...')).not.toBeInTheDocument();
+    });
+
+    // Нажимаем на кнопку удаления
+    fireEvent.click(screen.getByText('Delete'));
+
+    // В модальном окне нажимаем на кнопку удаления
+    fireEvent.click(screen.getAllByText('Delete')[1]); // Вторая кнопка Delete (в модальном окне)
+
+    await waitFor(() => {
+      expect(BookService.deleteBook).toHaveBeenCalledWith(1);
+      expect(toast.success).toHaveBeenCalledWith('Book deleted successfully');
+      expect(navigateMock).toHaveBeenCalledWith('/books');
+    });
+  });
+
+  it('должен закрывать модальное окно при нажатии на кнопку Cancel', async () => {
+    render(
+      <MemoryRouter>
+        <BookDetails />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading book details...')).not.toBeInTheDocument();
+    });
+
+    // Нажимаем на кнопку удаления
+    fireEvent.click(screen.getByText('Delete'));
+
+    // Проверяем, что модальное окно открылось
+    expect(screen.getByText('Are you sure you want to delete the book')).toBeInTheDocument();
+
+    // Нажимаем на кнопку отмены в модальном окне
+    fireEvent.click(screen.getByText('Cancel'));
+
+    // Проверяем, что модальное окно закрылось
+    await waitFor(() => {
+      expect(screen.queryByText('Are you sure you want to delete the book')).not.toBeInTheDocument();
+    });
+
+    // Проверяем, что функция удаления не была вызвана
+    expect(BookService.deleteBook).not.toHaveBeenCalled();
+  });
+
+  it('должен форматировать дату публикации', async () => {
+    render(
+      <MemoryRouter>
+        <BookDetails />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading book details...')).not.toBeInTheDocument();
+    });
+
+    // Проверяем, что дата отформатирована как локальная дата
+    const dateRegex = /\d{1,2}\/\d{1,2}\/\d{4}/;
+    expect(screen.getByText(dateRegex)).toBeInTheDocument();
+  });
+
+  it('должен отображать "Not specified" для отсутствующих данных', async () => {
+    const bookWithMissingData = {
+      ...mockBook,
+      isbn: undefined,
+      genre: undefined,
+      publicationDate: undefined
+    };
+    BookService.getBookById.mockResolvedValue({ data: bookWithMissingData });
+
+    render(
+      <MemoryRouter>
+        <BookDetails />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading book details...')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getAllByText('Not specified')).toHaveLength(2); // ISBN и Genre
+    expect(screen.getByText('Unknown')).toBeInTheDocument(); // Publication Date
+  });
+
+  it('должен отображать ссылки на список книг и редактирование', async () => {
+    render(
+      <MemoryRouter>
+        <BookDetails />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading book details...')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Back to Books').closest('a')).toHaveAttribute('href', '/books');
+    expect(screen.getByText('Edit').closest('a')).toHaveAttribute('href', '/books/edit/1');
+  });
 });
-// В начало файла теста добавь:
-// import { ..., within } from '@testing-library/react';
-// Если within уже есть, то ничего не добавляй.

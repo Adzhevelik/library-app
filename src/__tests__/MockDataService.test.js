@@ -1,55 +1,214 @@
-import MockBookService from '../MockDataService'; // РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ РїСѓС‚СЊ РїСЂР°РІРёР»СЊРЅС‹Р№
+import MockBookService from '../MockDataService';
 
 describe('MockDataService', () => {
+  // Мокируем localStorage
+  let mockLocalStorage = {};
+  
   beforeEach(() => {
-    // РћС‡РёС‰Р°РµРј localStorage РїРµСЂРµРґ РєР°Р¶РґС‹Рј С‚РµСЃС‚РѕРј, С‚Р°Рє РєР°Рє СЃРµСЂРІРёСЃ РµРіРѕ РёСЃРїРѕР»СЊР·СѓРµС‚
-    localStorage.clear();
-    // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЃ РґРµС„РѕР»С‚РЅС‹РјРё РєРЅРёРіР°РјРё, РµСЃР»Рё СЌС‚Рѕ РЅСѓР¶РЅРѕ РґР»СЏ РєР°Р¶РґРѕРіРѕ С‚РµСЃС‚Р°
-    // Р•СЃР»Рё initializeLocalStorage РІС‹Р·С‹РІР°РµС‚СЃСЏ РІРЅСѓС‚СЂРё С„СѓРЅРєС†РёР№ СЃРµСЂРІРёСЃР°, СЌС‚Рѕ РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµ РЅСѓР¶РЅРѕ Р·РґРµСЃСЊ.
+    mockLocalStorage = {};
+    
+    global.localStorage = {
+      getItem: jest.fn(key => mockLocalStorage[key] || null),
+      setItem: jest.fn((key, value) => {
+        mockLocalStorage[key] = value;
+      }),
+      removeItem: jest.fn(key => {
+        delete mockLocalStorage[key];
+      })
+    };
+    
+    // Устанавливаем фиксированную дату для тестов
+    jest.spyOn(global.Date, 'now').mockImplementation(() => new Date('2023-01-01').valueOf());
   });
 
-  test('getAllBooks returns a promise that resolves with an array of books', async () => {
-    const response = await MockBookService.getAllBooks();
-    expect(response).toHaveProperty('data');
-    expect(Array.isArray(response.data)).toBe(true);
-    // РњРѕР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ РїСЂРѕРІРµСЂРєСѓ РЅР° С‚Рѕ, С‡С‚Рѕ РІ data РµСЃС‚СЊ РєРЅРёРіРё, РµСЃР»Рё РѕРЅРё РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
-    if (response.data.length > 0) {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  describe('getAllBooks', () => {
+    it('должен возвращать все книги из localStorage или инициализировать их', async () => {
+      // Первый вызов должен инициализировать mockBooks в localStorage
+      const response = await MockBookService.getAllBooks();
+      
+      expect(localStorage.getItem).toHaveBeenCalledWith('mockBooks');
+      expect(localStorage.setItem).toHaveBeenCalled();
+      expect(response.data).toHaveLength(6); // В моковых данных 6 книг
+      
+      // Проверяем структуру данных
       expect(response.data[0]).toHaveProperty('id');
       expect(response.data[0]).toHaveProperty('title');
-    }
+      expect(response.data[0]).toHaveProperty('author');
+    });
+
+    it('должен возвращать книги из localStorage, если они уже существуют', async () => {
+      const mockBooks = [
+        { id: '99', title: 'Test Book', author: 'Test Author' }
+      ];
+      
+      localStorage.getItem.mockReturnValue(JSON.stringify(mockBooks));
+      
+      const response = await MockBookService.getAllBooks();
+      
+      expect(localStorage.getItem).toHaveBeenCalledWith('mockBooks');
+      expect(response.data).toEqual(mockBooks);
+    });
   });
 
-  test('getBookById returns a book if found', async () => {
-    // РЎРЅР°С‡Р°Р»Р° РґРѕР±Р°РІРёРј РєРЅРёРіСѓ С‡РµСЂРµР· СЃРµСЂРІРёСЃ, С‡С‚РѕР±С‹ СѓР±РµРґРёС‚СЊСЃСЏ, С‡С‚Рѕ РѕРЅР° РµСЃС‚СЊ
-    // РР»Рё РёСЃРїРѕР»СЊР·СѓРµРј ID РѕРґРЅРѕР№ РёР· РґРµС„РѕР»С‚РЅС‹С… РєРЅРёРі, РµСЃР»Рё РѕРЅРё РїСЂРµРґР·Р°РіСЂСѓР¶РµРЅС‹
-    // РџСЂРµРґРїРѕР»РѕР¶РёРј, С‡С‚Рѕ ID "1" СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ РЅР°С‡Р°Р»СЊРЅС‹С… РґР°РЅРЅС‹С…
-    const response = await MockBookService.getBookById('1');
-    expect(response).toHaveProperty('data');
-    expect(response.data.id).toBe('1');
-    expect(response.data.title).toBe('Р’РѕР№РЅР° Рё РјРёСЂ'); // РР· С‚РІРѕРёС… РјРѕРєРѕРІС‹С… РґР°РЅРЅС‹С…
+  describe('getBookById', () => {
+    it('должен возвращать книгу по ID', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      // Получаем книгу с ID = 1
+      const response = await MockBookService.getBookById('1');
+      
+      expect(response.data).toHaveProperty('id', '1');
+      expect(response.data).toHaveProperty('title', 'Война и мир');
+    });
+
+    it('должен возвращать ошибку, если книга не найдена', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      await expect(MockBookService.getBookById('999')).rejects.toMatchObject({
+        response: { data: { message: 'Book not found' } }
+      });
+    });
   });
 
-  test('getBookById rejects if book not found', async () => {
-    try {
-      await MockBookService.getBookById('nonexistentid');
-    } catch (error) {
-      expect(error).toEqual({ response: { data: { message: 'Book not found' } } });
-    }
+  describe('createBook', () => {
+    it('должен создавать новую книгу', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      const newBook = {
+        title: 'Новая книга',
+        author: 'Новый автор',
+        description: 'Описание новой книги',
+        genre: 'Фантастика',
+        availableCopies: 2,
+        totalCopies: 5
+      };
+      
+      const response = await MockBookService.createBook(newBook);
+      
+      expect(response.data).toHaveProperty('id');
+      expect(response.data).toHaveProperty('title', 'Новая книга');
+      expect(response.data).toHaveProperty('author', 'Новый автор');
+      expect(response.data).toHaveProperty('createdAt');
+      
+      // Проверяем, что книга добавлена в localStorage
+      const allBooks = JSON.parse(mockLocalStorage.mockBooks);
+      const createdBook = allBooks.find(book => book.title === 'Новая книга');
+      expect(createdBook).toBeTruthy();
+    });
   });
-  
-  // РњРѕР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ Р°РЅР°Р»РѕРіРёС‡РЅС‹Рµ РїСЂРѕСЃС‚С‹Рµ С‚РµСЃС‚С‹ РґР»СЏ createBook, updateBook, deleteBook, searchBooks
-  // РќР°РїСЂРёРјРµСЂ, РґР»СЏ createBook:
-  test('createBook adds a new book and returns it', async () => {
-    const newBookData = { title: 'New Test Book', author: 'Test Author', totalCopies: 1, availableCopies: 1 };
-    const response = await MockBookService.createBook(newBookData);
-    expect(response).toHaveProperty('data');
-    expect(response.data.title).toBe(newBookData.title);
-    expect(response.data).toHaveProperty('id'); // Р”РѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅ ID
 
-    // РџСЂРѕРІРµСЂРёРј, С‡С‚Рѕ РєРЅРёРіР° РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РґРѕР±Р°РІР»РµРЅР°
-    const allBooksResponse = await MockBookService.getAllBooks();
-    const foundBook = allBooksResponse.data.find(b => b.id === response.data.id);
-    expect(foundBook).toBeDefined();
-    expect(foundBook.title).toBe(newBookData.title);
+  describe('updateBook', () => {
+    it('должен обновлять существующую книгу', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      const updatedBook = {
+        title: 'Обновленное название',
+        author: 'Обновленный автор'
+      };
+      
+      const response = await MockBookService.updateBook('1', updatedBook);
+      
+      expect(response.data).toHaveProperty('id', '1');
+      expect(response.data).toHaveProperty('title', 'Обновленное название');
+      expect(response.data).toHaveProperty('author', 'Обновленный автор');
+      expect(response.data).toHaveProperty('updatedAt');
+      
+      // Проверяем, что книга обновлена в localStorage
+      const allBooks = JSON.parse(mockLocalStorage.mockBooks);
+      const book = allBooks.find(book => book.id === '1');
+      expect(book.title).toBe('Обновленное название');
+    });
+
+    it('должен возвращать ошибку, если книга для обновления не найдена', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      await expect(MockBookService.updateBook('999', { title: 'Новое название' })).rejects.toMatchObject({
+        response: { data: { message: 'Book not found' } }
+      });
+    });
+  });
+
+  describe('deleteBook', () => {
+    it('должен удалять книгу по ID', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      await MockBookService.deleteBook('1');
+      
+      // Проверяем, что книга удалена из localStorage
+      const allBooks = JSON.parse(mockLocalStorage.mockBooks);
+      const book = allBooks.find(book => book.id === '1');
+      expect(book).toBeUndefined();
+    });
+
+    it('должен возвращать ошибку, если книга для удаления не найдена', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      await expect(MockBookService.deleteBook('999')).rejects.toMatchObject({
+        response: { data: { message: 'Book not found' } }
+      });
+    });
+  });
+
+  describe('searchBooks', () => {
+    it('должен искать книги по заголовку', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      const response = await MockBookService.searchBooks('война');
+      
+      expect(response.data).toHaveLength(1);
+      expect(response.data[0]).toHaveProperty('title', 'Война и мир');
+    });
+
+    it('должен искать книги по автору', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      const response = await MockBookService.searchBooks('Толстой');
+      
+      expect(response.data).toHaveLength(1);
+      expect(response.data[0]).toHaveProperty('author', 'Лев Толстой');
+    });
+
+    it('должен искать книги по ISBN', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      const response = await MockBookService.searchBooks('9785171147426');
+      
+      expect(response.data).toHaveLength(1);
+      expect(response.data[0]).toHaveProperty('isbn', '9785171147426');
+    });
+
+    it('должен искать книги по жанру', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      const response = await MockBookService.searchBooks('Роман');
+      
+      // В моковых данных есть несколько книг жанра "Роман"
+      expect(response.data.length).toBeGreaterThan(0);
+      expect(response.data[0]).toHaveProperty('genre', 'Роман');
+    });
+
+    it('должен возвращать пустой массив, если ничего не найдено', async () => {
+      // Инициализируем mockBooks
+      await MockBookService.getAllBooks();
+      
+      const response = await MockBookService.searchBooks('несуществующая книга');
+      
+      expect(response.data).toHaveLength(0);
+    });
   });
 });

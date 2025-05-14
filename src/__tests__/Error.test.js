@@ -4,41 +4,45 @@ import { MemoryRouter } from 'react-router-dom';
 import Error from '../Error';
 
 describe('Error Component', () => {
-  test('renders the error message provided', () => {
-    const errorMessage = 'Something went terribly wrong!';
+  it('должен отображать сообщение об ошибке', () => {
+    const errorMessage = 'Тестовая ошибка';
+    
     render(
       <MemoryRouter>
         <Error message={errorMessage} />
       </MemoryRouter>
     );
+
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
-    // Р’ С‚РІРѕРµРј РєРѕРјРїРѕРЅРµРЅС‚Рµ Error.js РµСЃС‚СЊ РёРєРѕРЅРєР° вљ пёЏ, Р° РЅРµ ??
-    expect(screen.getByText('вљ пёЏ')).toBeInTheDocument(); 
+    expect(screen.getByText('Back to Books')).toBeInTheDocument();
+    expect(screen.getByText('Back to Books').closest('a')).toHaveAttribute('href', '/books');
   });
 
-  test('renders the default back link correctly', () => {
-    const errorMessage = 'Error occurred.';
+  it('должен отображать иконку предупреждения', () => {
     render(
       <MemoryRouter>
-        <Error message={errorMessage} />
+        <Error message="Ошибка" />
       </MemoryRouter>
     );
-    const backLink = screen.getByRole('link', { name: /Back to Books/i });
-    expect(backLink).toBeInTheDocument();
-    expect(backLink).toHaveAttribute('href', '/books');
+
+    expect(screen.getByText('??')).toBeInTheDocument();
   });
 
-  test('renders a custom back link correctly', () => {
-    const errorMessage = 'Another error.';
-    const customLink = '/dashboard';
-    const customText = 'Go to Dashboard';
+  it('должен использовать пользовательскую ссылку и текст, если они предоставлены', () => {
+    const customLink = '/custom-link';
+    const customText = 'Вернуться на главную';
+    
     render(
       <MemoryRouter>
-        <Error message={errorMessage} backLink={customLink} backText={customText} />
+        <Error 
+          message="Ошибка" 
+          backLink={customLink} 
+          backText={customText} 
+        />
       </MemoryRouter>
     );
-    const backLink = screen.getByRole('link', { name: customText });
-    expect(backLink).toBeInTheDocument();
-    expect(backLink).toHaveAttribute('href', customLink);
+
+    expect(screen.getByText(customText)).toBeInTheDocument();
+    expect(screen.getByText(customText).closest('a')).toHaveAttribute('href', customLink);
   });
 });

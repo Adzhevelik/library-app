@@ -1,57 +1,88 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Header from '../Header';
 
-// Mock StatusIndicator as it's a child component and might have its own logic/API calls
-jest.mock('../StatusIndicator', () => () => <div data-testid="status-indicator-mock">Status Mock</div>);
+// Мокируем StatusIndicator
+jest.mock('../StatusIndicator', () => () => <div>Mocked Status Indicator</div>);
 
 describe('Header Component', () => {
-  const user = userEvent.setup();
-
-  const renderWithRouter = (initialEntries = ['/']) => {
+  it('должен отображать логотип и навигационные ссылки', () => {
     render(
-      <MemoryRouter initialEntries={initialEntries}>
+      <MemoryRouter>
         <Header />
       </MemoryRouter>
     );
-  };
 
-  it('should render the logo link and status indicator', () => {
-    renderWithRouter();
-    const logoLink = screen.getByRole('link', { name: /Library MS/i });
-    expect(logoLink).toBeInTheDocument();
-    expect(logoLink).toHaveTextContent('рџ“љ Library MS');
-    expect(logoLink).toHaveAttribute('href', '/');
-    expect(screen.getByTestId('status-indicator-mock')).toBeInTheDocument();
+    expect(screen.getByText('?? Library MS')).toBeInTheDocument();
+    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('All Books')).toBeInTheDocument();
+    expect(screen.getByText('Add Book')).toBeInTheDocument();
+    expect(screen.getByText('Search')).toBeInTheDocument();
   });
 
-  it('should render navigation links', () => {
-    renderWithRouter();
-    expect(screen.getByRole('link', { name: /Home/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /All Books/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Add Book/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Search/i })).toBeInTheDocument();
+  it('должен отображать StatusIndicator', () => {
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Mocked Status Indicator')).toBeInTheDocument();
   });
 
-  it('should highlight the active link', () => {
-    renderWithRouter(['/books/add']);
-    const addBookLink = screen.getByRole('link', { name: /Add Book/i });
-    expect(addBookLink).toHaveClass('active');
+  it('должен отображать корректные ссылки', () => {
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('?? Library MS').closest('a')).toHaveAttribute('href', '/');
+    expect(screen.getByText('Home').closest('a')).toHaveAttribute('href', '/');
+    expect(screen.getByText('All Books').closest('a')).toHaveAttribute('href', '/books');
+    expect(screen.getByText('Add Book').closest('a')).toHaveAttribute('href', '/books/add');
+    expect(screen.getByText('Search').closest('a')).toHaveAttribute('href', '/search');
   });
 
-  // Mobile menu tests can be tricky with JSDOM as it doesn't fully support layout/CSS.
-  // A simple check for the icon presence is usually enough for smoke testing.
-  // If your CSS for .show relies on actual rendering, these might be flaky.
-  it('should show menu icon for mobile (presence test)', () => {
-    renderWithRouter();
-    // The menu icon in your Header.js is a div with class 'menu-icon'
-    // It might not have an explicit role. Let's find it by its structure or a test-id if you add one.
-    // For simplicity, we'll assume it's always rendered by Header.
-    // If your test for toggling class 'show' works, keep it. If not, simplify.
-    const header = screen.getByRole('banner'); // Header component uses <header>
-    const menuIcon = header.querySelector('.menu-icon');
-    expect(menuIcon).toBeInTheDocument();
+  it('должен переключать мобильное меню при клике на иконку меню', () => {
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    );
+
+    // Меню должно быть скрыто изначально
+    expect(screen.getByRole('navigation').classList).not.toContain('show');
+
+    // Нажимаем на иконку меню
+    fireEvent.click(screen.getByClassName('menu-icon'));
+
+    // Меню должно отображаться
+    expect(screen.getByRole('navigation').classList).toContain('show');
+
+    // Нажимаем на иконку меню снова
+    fireEvent.click(screen.getByClassName('menu-icon'));
+
+    // Меню должно скрыться
+    expect(screen.getByRole('navigation').classList).not.toContain('show');
+  });
+
+  it('должен скрывать меню при клике на ссылку в мобильном режиме', () => {
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    );
+
+    // Открываем меню
+    fireEvent.click(screen.getByClassName('menu-icon'));
+    expect(screen.getByRole('navigation').classList).toContain('show');
+
+    // Нажимаем на ссылку
+    fireEvent.click(screen.getByText('Home'));
+
+    // Меню должно скрыться
+    expect(screen.getByRole('navigation').classList).not.toContain('show');
   });
 });

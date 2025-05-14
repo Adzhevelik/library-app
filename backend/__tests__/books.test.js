@@ -2,21 +2,19 @@ const request = require('supertest');
 const express = require('express');
 const cors = require('cors');
 
-// Мокируем pool до импорта маршрутов
+// Мокируем pool ДО импорта bookRoutes
 jest.mock('../db', () => ({
   query: jest.fn()
 }));
 
-// Импортируем pool после мокирования
+// Импортируем зависимости после мокирования
 const pool = require('../db');
+const bookRoutes = require('../routes/books');
 
 // Создаем тестовое Express-приложение
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// Импортируем маршруты только после мокирования всех зависимостей
-const bookRoutes = require('../routes/books');
 app.use('/api/books', bookRoutes);
 
 describe('Book API', () => {

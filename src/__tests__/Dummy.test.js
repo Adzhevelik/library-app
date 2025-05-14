@@ -1,6 +1,5 @@
-// src/__tests__/Dummy.test.js
-describe('Dummy Suite', () => {
-  test('should be true', () => {
+describe('Dummy test', () => {
+  it('should pass', () => {
     expect(true).toBe(true);
   });
 });

@@ -1,3 +1,4 @@
+// index.test.js - modified version
 const request = require('supertest');
 const express = require('express');
 
@@ -17,8 +18,9 @@ jest.mock('dotenv', () => ({
   config: jest.fn()
 }));
 
-jest.mock('./routes/books', () => 'book-routes');
-jest.mock('./db', () => ({}));
+// Исправляем пути - нужно использовать относительные пути от папки __tests__
+jest.mock('../routes/books', () => 'book-routes');
+jest.mock('../db', () => ({}));
 
 // После мокирования зависимостей импортируем server
 const server = require('../index');

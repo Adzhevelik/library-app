@@ -2,12 +2,11 @@ const request = require('supertest');
 const express = require('express');
 const cors = require('cors');
 
-// Мокируем pool ДО импорта bookRoutes
+// Мокируем pool перед импортом маршрутов
 jest.mock('../db', () => ({
   query: jest.fn()
 }));
 
-// Импортируем зависимости после мокирования
 const pool = require('../db');
 const bookRoutes = require('../routes/books');
 

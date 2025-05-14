@@ -1,3 +1,4 @@
+// backend/__tests__/db.test.js
 const { Pool } = require('pg');
 
 jest.mock('pg', () => {
@@ -16,7 +17,7 @@ describe('Database Module', () => {
     process.env.DB_PORT = '5432';
     process.env.DB_NAME = 'librarydb';
     process.env.DB_USER = 'libraryuser';
-    process.env.DB_PASSWORD = 'Ubizor21!';
+    process.env.DB_PASSWORD = 'password';
     
     // Очищаем кэш для модуля db
     jest.resetModules();

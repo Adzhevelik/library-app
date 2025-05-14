@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "jest --runInBand"
+    "test": "node __tests__/ci-test-runner.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

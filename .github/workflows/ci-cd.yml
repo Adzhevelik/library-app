@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Use Node.js 16.x
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '16.x'
     
@@ -32,10 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Use Node.js 16.x
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '16.x'
     
@@ -51,17 +51,12 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Use Node.js 16.x
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '16.x'
-    
-    - name: Install backend dependencies
-      run: |
-        cd backend
-        npm install --production
     
     - name: Create backend build
       run: |
@@ -72,10 +67,12 @@ jobs:
         cp -r *.js dist/ 2>/dev/null || true
         cp -r routes dist/ 2>/dev/null || true
         cp package.json dist/
-        cp -r node_modules dist/ 2>/dev/null || true
+        
+        # Устанавливаем только prod зависимости
+        cd dist && npm install --production
         
         # Создаем .env.example
-        cat > dist/.env.example << 'EOL'
+        cat > .env.example << 'EOL'
         PORT=8080
         DB_HOST=localhost
         DB_PORT=5432
@@ -85,10 +82,10 @@ jobs:
         EOL
         
         echo "Backend build completed"
-        ls -la dist/
+        ls -la
     
     - name: Upload backend build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: backend-build
         path: backend/dist/
@@ -98,10 +95,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Use Node.js 16.x
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '16.x'
     
@@ -119,7 +116,7 @@ jobs:
         du -sh build/
     
     - name: Upload frontend build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: frontend-build
         path: build/
@@ -131,13 +128,13 @@ jobs:
     
     steps:
     - name: Download backend artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: backend-build
         path: ./backend-dist
     
     - name: Download frontend artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: frontend-build
         path: ./frontend-dist

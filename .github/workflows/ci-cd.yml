@@ -123,29 +123,3 @@ jobs:
       with:
         name: frontend-build
         path: build/
-
-  deploy:
-    needs: [build-backend, build-frontend]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Download backend artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: backend-build
-        path: ./backend-dist
-    
-    - name: Download frontend artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: frontend-build
-        path: ./frontend-dist
-    
-    - name: Deploy preparation
-      run: |
-        echo "Backend files:"
-        ls -la backend-dist/
-        echo "Frontend files:"
-        ls -la frontend-dist/
-        echo "Ready for deployment"
